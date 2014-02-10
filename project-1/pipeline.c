@@ -1,14 +1,14 @@
-/**************************************************************/
-/* CS/COE 1541				 			
-   just compile with gcc -o pipeline pipeline.c			
-   and execute using							
-   ./pipeline  /afs/cs.pitt.edu/courses/1541/short_traces/sample.tr	0  
+/**************************************************************
+ CS/COE 1541
+   just compile with gcc -o pipeline pipeline.c
+   and execute using
+   ./pipeline  /afs/cs.pitt.edu/courses/1541/short_traces/sample.tr 0
 ***************************************************************/
 
 #include <stdio.h>
 #include <inttypes.h>
 #include <arpa/inet.h>
-#include "trace_item.h" 
+#include "trace_item.h"
 
 #define TRACE_BUFSIZE 1024*1024
 
@@ -24,7 +24,7 @@ int is_big_endian(void)
         char c[4];
     } bint = {0x01020304};
 
-    return bint.c[0] == 1; 
+    return bint.c[0] == 1;
 }
 
 uint32_t my_ntohl(uint32_t x)
@@ -56,17 +56,17 @@ int trace_get_item(struct trace_item **item)
 {
   int n_items;
 
-  if (trace_buf_ptr == trace_buf_end) {	/* if no more unprocessed items in the trace buffer, get new data  */
+  if (trace_buf_ptr == trace_buf_end) { /* if no more unprocessed items in the trace buffer, get new data  */
     n_items = fread(trace_buf, sizeof(struct trace_item), TRACE_BUFSIZE, trace_fd);
-    if (!n_items) return 0;				/* if no more items in the file, we are done */
+    if (!n_items) return 0;       /* if no more items in the file, we are done */
 
     trace_buf_ptr = 0;
-    trace_buf_end = n_items;			/* n_items were read and placed in trace buffer */
+    trace_buf_end = n_items;      /* n_items were read and placed in trace buffer */
   }
 
-  *item = &trace_buf[trace_buf_ptr];	/* read a new trace item for processing */
+  *item = &trace_buf[trace_buf_ptr];  /* read a new trace item for processing */
   trace_buf_ptr++;
-  
+
   if (is_big_endian()) {
     (*item)->PC = my_ntohl((*item)->PC);
     (*item)->Addr = my_ntohl((*item)->Addr);
@@ -81,7 +81,7 @@ int main(int argc, char **argv)
   size_t size;
   char *trace_file_name;
   int trace_view_on = 0;
-  
+
   unsigned char t_type = 0;
   unsigned char t_sReg_a= 0;
   unsigned char t_sReg_b= 0;
@@ -96,7 +96,7 @@ int main(int argc, char **argv)
     fprintf(stdout, "\n(switch) to turn on or off individual item view.\n\n");
     exit(0);
   }
-    
+
   trace_file_name = argv[1];
   if (argc == 3) trace_view_on = atoi(argv[2]) ;
 
@@ -113,7 +113,7 @@ int main(int argc, char **argv)
 
   while(1) {
     size = trace_get_item(&tr_entry);
-   
+
     if (!size) {       /* no more instructions (trace_items) to simulate */
       printf("+ Simulation terminates at cycle : %u\n", cycle_number);
       break;
@@ -126,7 +126,7 @@ int main(int argc, char **argv)
       t_dReg = tr_entry->dReg;
       t_PC = tr_entry->PC;
       t_Addr = tr_entry->Addr;
-    }  
+    }
 
 // SIMULATION OF A SINGLE CYCLE cpu IS TRIVIAL - EACH INSTRUCTION IS EXECUTED
 // IN ONE CYCLE
@@ -145,11 +145,11 @@ int main(int argc, char **argv)
           printf(" (PC: %x)(sReg_a: %d)(dReg: %d)(addr: %x)\n", tr_entry->PC, tr_entry->sReg_a, tr_entry->dReg, tr_entry->Addr);
           break;
         case ti_LOAD:
-          printf("[cycle %d] LOAD:",cycle_number) ;      
+          printf("[cycle %d] LOAD:",cycle_number) ;
           printf(" (PC: %x)(sReg_a: %d)(dReg: %d)(addr: %x)\n", tr_entry->PC, tr_entry->sReg_a, tr_entry->dReg, tr_entry->Addr);
           break;
         case ti_STORE:
-          printf("[cycle %d] STORE:",cycle_number) ;      
+          printf("[cycle %d] STORE:",cycle_number) ;
           printf(" (PC: %x)(sReg_a: %d)(sReg_b: %d)(addr: %x)\n", tr_entry->PC, tr_entry->sReg_a, tr_entry->sReg_b, tr_entry->Addr);
           break;
         case ti_BRANCH:
@@ -161,7 +161,7 @@ int main(int argc, char **argv)
           printf(" (PC: %x)(addr: %x)\n", tr_entry->PC,tr_entry->Addr);
           break;
         case ti_SPECIAL:
-          printf("[cycle %d] SPECIAL:",cycle_number) ;      	
+          printf("[cycle %d] SPECIAL:",cycle_number) ;
           break;
         case ti_JRTYPE:
           printf("[cycle %d] JRTYPE:",cycle_number) ;
@@ -175,5 +175,4 @@ int main(int argc, char **argv)
 
   exit(0);
 }
-
 
