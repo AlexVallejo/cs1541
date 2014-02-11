@@ -24,24 +24,24 @@ enum cache_policy {
 };
 
 struct cache_t {
-  int nsets;		// # sets
-  int bsize;		// block size
-  int assoc;		// associativity
+  int nsets;    // # sets
+  int bsize;    // block size
+  int assoc;    // associativity
 
-  enum cache_policy policy;       // cache replacement policy
-  struct cache_blk_t **blocks;    // cache blocks in the cache
-	unsigned long long **ts;        // keep a timestamp for each cache block
+  enum cache_policy policy;     // cache replacement policy
+  struct cache_blk_t **blocks;  // cache blocks in the cache
+  unsigned long long **ts;      // keep a timestamp for each cache block
 };
 
 struct cache_t *
 cache_create(int size, int blocksize, int assoc, enum cache_policy policy)
 {
-// The cache is represented by a 2-D array of blocks. 
+// The cache is represented by a 2-D array of blocks.
 // The first dimension of the 2D array is "nsets" which is the number of sets (entries)
 // The second dimension is "assoc", which is the number of blocks in each set.
 // A timestamp is associated with each block to record time (used to implement replacement policies).
 
-	int i;
+  int i;
   int nblocks = 1; // number of blocks in the cache
   int nsets = 1;   // number of sets (entries) in the cache
 
@@ -52,8 +52,8 @@ cache_create(int size, int blocksize, int assoc, enum cache_policy policy)
   // nsets = Y;
 
   struct cache_t *C = (struct cache_t *)calloc(1, sizeof(struct cache_t));
-		
-  C->nsets = nsets; 
+
+  C->nsets = nsets;
   C->bsize = blocksize;
   C->assoc = assoc;
   C->policy = policy;
@@ -61,19 +61,17 @@ cache_create(int size, int blocksize, int assoc, enum cache_policy policy)
   C->blocks= (struct cache_blk_t **)calloc(nsets, sizeof(struct cache_blk_t));
   C->ts = (unsigned long long **)calloc(nsets, sizeof(unsigned long long));
 
-	for(i = 0; i < nsets; i++) {
-		C->blocks[i] = (struct cache_blk_t *)calloc(assoc, sizeof(struct cache_blk_t));
+  for(i = 0; i < nsets; i++) {
+    C->blocks[i] = (struct cache_blk_t *)calloc(assoc, sizeof(struct cache_blk_t));
     C->ts[i] = (unsigned long long *)calloc(assoc, sizeof(unsigned long long));
-	}
+  }
 
   return C;
 }
 
-int
-cache_access(struct cache_t *cp, unsigned long address, 
-             char access_type, unsigned long long now)
-{
-	//////////////////////////////////////////////////////////////////////
+int cache_access(struct cache_t *cp, unsigned long address, char access_type,   \
+                 unsigned long long now) {
+  //////////////////////////////////////////////////////////////////////
   //
   // Your job:
   // based on address determine the set to access in cp
@@ -82,7 +80,7 @@ cache_access(struct cache_t *cp, unsigned long address,
   // if update the block list based on the replacement policy
   // return 0 if a hit, 1 if a miss or 2 if a miss_with_write_back
   //
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
 }
 
 #endif
