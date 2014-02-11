@@ -12,7 +12,7 @@ float** a ;
 float* b ;
 float* x ;
 
-main (int argc, char *argv[] )    {
+int main (int argc, char *argv[] )    {
 /* the array size should be supplied as a command line argument */
   if(argc != 2) {printf("wrong number of arguments") ; exit(2) ;}
   N = atoi(argv[1]) ;
