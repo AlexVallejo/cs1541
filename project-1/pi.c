@@ -4,13 +4,17 @@
 #include <sys/time.h>
 
 # define MAX_THREADS         64
-void *compute_pi   ( void *);
+void *compute_pi( void *);
 
 int total_hits, total_misses,
     sample_points, sample_points_per_thread, num_threads;
-struct arg_to_thread {int t_seed ; int hits ;} ;
 
-main (int argc, char *argv[]  )    {
+struct arg_to_thread {
+  int t_seed;
+  int hits ;
+};
+
+int main(int argc, char *argv[]  ) {
   /* two arguments should be supplied - the number of points and the number of threads */
   if(argc != 3) {printf("wrong number of arguments") ; exit(2) ;};
   int i;
@@ -54,9 +58,9 @@ main (int argc, char *argv[]  )    {
        printf ("%lf\n", time_end - time_start);
 }
 
-void  *compute_pi (void *s) {
-  struct arg_to_thread *local_arg ;
-  int seed, i ;
+void *compute_pi(void *s){
+  struct arg_to_thread *local_arg;
+  unsigned int seed, i;
   double rand_no_x, rand_no_y;
   int local_hits;
   local_arg = s;
