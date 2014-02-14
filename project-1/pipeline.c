@@ -78,11 +78,12 @@ int trace_get_item(struct trace_item **item)
 
 int main(int argc, char **argv)
 {
-  struct trace_item *tr_entry;
+  struct trace_item *tr_entry;  // The inst. fetched from inst. mem.
   size_t size;
   char *trace_file_name;
-  int trace_view_on = 0;
+  int trace_view_on = 0;        // Set print's for each cycle off for default
 
+  // Explanations of each field are in trace_item.c
   unsigned char t_type = 0;
   unsigned char t_sReg_a= 0;
   unsigned char t_sReg_b= 0;
@@ -91,6 +92,13 @@ int main(int argc, char **argv)
   unsigned int t_Addr = 0;
 
   unsigned int cycle_number = 0;
+
+  // trace_item's that represent the buffer's on the 5 stage pipeline
+  struct trace_item *inst_fetch;  // Instruction fetch
+  struct trace_item *decode;      // Instruction decode
+  struct trace_item *ex;          // Instruction execuition
+  struct trace_item *mem;         // Memory access (read or write)
+  struct trace_item *wb;          // write back to the register
 
   if (argc == 1) {
     fprintf(stdout, "\nUSAGE: tv <trace_file> <switch - any character>\n");
