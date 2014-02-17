@@ -193,6 +193,9 @@ int main(int argc, char **argv)
       buffer[3] = buffer[2];
       buffer[2] = buffer[1];
       buffer[1] = buffer[0];
+      //if (tr_entry->source_entry){
+      //TODO implement stalling for load and use conflicting
+      //}
       buffer[0] = *tr_entry;
     }
 
