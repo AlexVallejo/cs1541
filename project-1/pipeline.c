@@ -179,25 +179,64 @@ int main(int argc, char **argv)
 
   trace_init();
 
+  //TODO the first and last instructions of the program are not displayed correctly
+  // it should have no-op's at the begining until the first 4 are executed and
+  // no-ops at the end while the last 5 are being executed
   while (1) {
     size = trace_get_item(&tr_entry);
 
-    if (!size) {       /* no more instructions (trace_items) to simulate */
+    if (!size) {  // no more instructions (trace_items) to simulate */
       printf("\nSimulation terminates at cycle : %u\n", cycle_number);
       break;
     }
 
-    // Move the instructions through the pipeline
-    else {
+    else {  // Move the instructions through the pipeline
       cycle_number++;
       buffer[3] = buffer[2];
       buffer[2] = buffer[1];
       buffer[1] = buffer[0];
-      //if (tr_entry->source_entry){
-      //TODO implement stalling for load and use conflicting
-      //}
-      buffer[0] = *tr_entry;
-    }
+
+      // IF the buffer is empty compare the most recently read instruction to
+      // instruction in the inst. fetch buffer
+      if (1) { //TODO replace with load_use_conflict_buffer.isEmpty();
+        // Stall if a i-type follows a load and it's source reg. is the same as
+        // the dest. reg of the load
+        if (tr_entry->type == 2 && buffer[0].type == 3) {
+          if (tr_entry->sReg_a == buffer[0].dReg) {
+            printf("\n*****STALL*****\n");
+            buffer[0] = *tr_entry;
+            print_buffers();
+          }
+        }
+
+        // Stall if a r-type follows a load and either of it's source registers
+        // are the same as the dest reg of the load
+        else if (tr_entry->type == 1 && buffer[0].type == 3) {
+          if (tr_entry->sReg_a == buffer[0].dReg) {
+            printf("\n*****STALL*****\n");
+            buffer[0] = *tr_entry;
+            print_buffers();
+          }
+
+          else if (tr_entry->sReg_b == buffer[0].dReg) {
+            printf("\n*****STALL*****\n");
+            buffer[0] = *tr_entry;
+            print_buffers();
+          }
+        }
+
+        // There is no load-use conflict detected, proceed as normal
+        else {
+          buffer[0] = *tr_entry;
+        }
+      } //END load_use_conflict_buffer.isEmpty()
+
+      //ELSE the buffer is not empty. We need to look at the last inst. in the
+      //buffer to determine if there is a load-use conflict with the newest inst.
+      else {
+
+      }
+    }// END ELSE there are still more inst's left to read
 
     if (trace_view_on)    // If trace view is on dump the contents of the buffers
       print_buffers();    // to the screen
