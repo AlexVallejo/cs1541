@@ -144,6 +144,29 @@ int print_buffers(){
   return 1;
 }// END print_buffer(int trace_view_on)
 
+int insert_stall(){
+
+  // Init a new no-op in case we need to insert it in the pipeline
+  struct trace_item no_op;
+  no_op.type = 0;
+  no_op.sReg_a = 0;
+  no_op.sReg_b = 0;
+  no_op.dReg = 0;
+  no_op.PC = 0;
+  no_op.Addr = 0;
+
+  printf("\n*****STALL*****\n");
+
+  printf("\nConflicting Pipeline: ");
+  print_buffers();
+  buffer[0] = no_op;
+  //TODO enqueue *tr_entry to the load_use_conflict_buffer
+  printf("\nResolved Pipeline: ");
+  print_buffers();
+
+  return 1;
+}
+
 int main(int argc, char **argv)
 {
   struct trace_item *tr_entry;  // The inst. fetched from inst. mem.
@@ -203,9 +226,7 @@ int main(int argc, char **argv)
         // the dest. reg of the load
         if (tr_entry->type == 2 && buffer[0].type == 3) {
           if (tr_entry->sReg_a == buffer[0].dReg) {
-            printf("\n*****STALL*****\n");
-            buffer[0] = *tr_entry;
-            print_buffers();
+            insert_stall();
           }
         }
 
@@ -213,15 +234,11 @@ int main(int argc, char **argv)
         // are the same as the dest reg of the load
         else if (tr_entry->type == 1 && buffer[0].type == 3) {
           if (tr_entry->sReg_a == buffer[0].dReg) {
-            printf("\n*****STALL*****\n");
-            buffer[0] = *tr_entry;
-            print_buffers();
+            insert_stall();
           }
 
           else if (tr_entry->sReg_b == buffer[0].dReg) {
-            printf("\n*****STALL*****\n");
-            buffer[0] = *tr_entry;
-            print_buffers();
+            insert_stall();
           }
         }
 
