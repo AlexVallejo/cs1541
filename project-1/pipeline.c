@@ -12,7 +12,7 @@
 #include "trace_item.h"
 
 #define TRACE_BUFSIZE 1024*1024
-#define NUM_BUFFERS 5
+#define NUM_BUFFERS 4
 
 static FILE *trace_fd;
 static int trace_buf_ptr;
@@ -91,19 +91,16 @@ int print_buffers(){
 
     switch (i) {
       case 0:
-        printf("%-6s => ", "IF");
+        printf("%-6s => ", "IF/ID");
         break;
       case 1:
-        printf("%-6s => ", "DECODE");
+        printf("%-6s => ", "ID/EX");
         break;
       case 2:
-        printf("%-6s => ","EX");
+        printf("%-6s => ","EX/MEM");
         break;
       case 3:
-        printf("%-6s => ","MEM");
-        break;
-      case 4:
-        printf("%-6s => ","WB");
+        printf("%-6s => ","MEM/WB");
         break;
     }
 
@@ -193,7 +190,6 @@ int main(int argc, char **argv)
     // Move the instructions through the pipeline
     else {
       cycle_number++;
-      buffer[4] = buffer[3];
       buffer[3] = buffer[2];
       buffer[2] = buffer[1];
       buffer[1] = buffer[0];
