@@ -21,7 +21,7 @@ static struct trace_item *trace_buf;
 
 unsigned int cycle_number = 0;
 
-struct trace_item buffers[NUM_BUFFERS];   // Pipeline Buffers
+struct trace_item buffer[NUM_BUFFERS];    // Pipeline Buffers
 struct trace_item *tr_entry;              // Temporary holding entry
 
 int is_big_endian(void)
@@ -82,55 +82,67 @@ int trace_get_item(struct trace_item **item)
   return 1;
 }
 
-int print_inst(int trace_view_on){
+int print_buffers(){
+
+  printf("\n---------------------CYCLE #%d-------------------\n",cycle_number);
 
   for (int i = 0; i < NUM_BUFFERS; i++){
-    if (trace_view_on) {/* print the executed instruction if trace_view_on=1 */
-      switch(tr_entry->type) {
-        case ti_NOP:
-          printf("[cycle %d] NOP:",cycle_number) ;
-          break;
+    tr_entry = &buffer[i];
 
-        case ti_RTYPE:
-          printf("[cycle %d] RTYPE:",cycle_number) ;
-          printf(" (PC: %x)(sReg_a: %d)(sReg_b: %d)(dReg: %d) \n", tr_entry->PC, tr_entry->sReg_a, tr_entry->sReg_b, tr_entry->dReg);
-          break;
+    switch (i) {
+      case 0:
+        printf("%-6s => ", "IF");
+        break;
+      case 1:
+        printf("%-6s => ", "DECODE");
+        break;
+      case 2:
+        printf("%-6s => ","EX");
+        break;
+      case 3:
+        printf("%-6s => ","MEM");
+        break;
+      case 4:
+        printf("%-6s => ","WB");
+        break;
+    }
 
-        case ti_ITYPE:
-          printf("[cycle %d] ITYPE:",cycle_number) ;
-          printf(" (PC: %x)(sReg_a: %d)(dReg: %d)(addr: %x)\n", tr_entry->PC, tr_entry->sReg_a, tr_entry->dReg, tr_entry->Addr);
-          break;
-
-        case ti_LOAD:
-          printf("[cycle %d] LOAD:",cycle_number) ;
-          printf(" (PC: %x)(sReg_a: %d)(dReg: %d)(addr: %x)\n", tr_entry->PC, tr_entry->sReg_a, tr_entry->dReg, tr_entry->Addr);
-          break;
-
-        case ti_STORE:
-          printf("[cycle %d] STORE:",cycle_number) ;
-          printf(" (PC: %x)(sReg_a: %d)(sReg_b: %d)(addr: %x)\n", tr_entry->PC, tr_entry->sReg_a, tr_entry->sReg_b, tr_entry->Addr);
-          break;
-
-        case ti_BRANCH:
-          printf("[cycle %d] BRANCH:",cycle_number) ;
-          printf(" (PC: %x)(sReg_a: %d)(sReg_b: %d)(addr: %x)\n", tr_entry->PC, tr_entry->sReg_a, tr_entry->sReg_b, tr_entry->Addr);
-          break;
-
-        case ti_JTYPE:
-          printf("[cycle %d] JTYPE:",cycle_number) ;
-          printf(" (PC: %x)(addr: %x)\n", tr_entry->PC,tr_entry->Addr);
-          break;
-
-        case ti_SPECIAL:
-          printf("[cycle %d] SPECIAL:",cycle_number) ;
-          break;
-
-        case ti_JRTYPE:
-          printf("[cycle %d] JRTYPE:",cycle_number) ;
-          printf(" (PC: %x) (sReg_a: %d)(addr: %x)\n", tr_entry->PC, tr_entry->dReg, tr_entry->Addr);
-          break;
-        } // END switch
-      }// END if (trace_view_on)
+    switch (tr_entry->type) {
+      case ti_NOP:
+        printf("NOP\n");
+        break;
+      case ti_RTYPE:
+        printf("RTYPE: ") ;
+        printf("(PC: %x)(sReg_a: %d)(sReg_b: %d)(dReg: %d)\n", tr_entry->PC, tr_entry->sReg_a, tr_entry->sReg_b, tr_entry->dReg);
+        break;
+      case ti_ITYPE:
+        printf("ITYPE:") ;
+        printf(" (PC: %x)(sReg_a: %d)(dReg: %d)(addr: %x)\n", tr_entry->PC, tr_entry->sReg_a, tr_entry->dReg, tr_entry->Addr);
+        break;
+      case ti_LOAD:
+        printf("LOAD:") ;
+        printf(" (PC: %x)(sReg_a: %d)(dReg: %d)(addr: %x)\n", tr_entry->PC, tr_entry->sReg_a, tr_entry->dReg, tr_entry->Addr);
+        break;
+      case ti_STORE:
+        printf("STORE:") ;
+        printf(" (PC: %x)(sReg_a: %d)(sReg_b: %d)(addr: %x)\n", tr_entry->PC, tr_entry->sReg_a, tr_entry->sReg_b, tr_entry->Addr);
+        break;
+      case ti_BRANCH:
+        printf("BRANCH:") ;
+        printf(" (PC: %x)(sReg_a: %d)(sReg_b: %d)(addr: %x)\n", tr_entry->PC, tr_entry->sReg_a, tr_entry->sReg_b, tr_entry->Addr);
+        break;
+      case ti_JTYPE:
+        printf("JTYPE:") ;
+        printf(" (PC: %x)(addr: %x)\n", tr_entry->PC,tr_entry->Addr);
+        break;
+      case ti_SPECIAL:
+        printf("SPECIAL\n") ;
+        break;
+      case ti_JRTYPE:
+        printf("JRTYPE:") ;
+        printf(" (PC: %x) (sReg_a: %d)(addr: %x)\n", tr_entry->PC, tr_entry->dReg, tr_entry->Addr);
+        break;
+      } // END switch
     }// END for (int i = 0; i < NUM_BUFFERS; i++)
   return 1;
 }// END print_inst(int trace_view_on)
@@ -170,25 +182,19 @@ int main(int argc, char **argv)
 
   trace_init();
 
-  while(1) {
+  while (1) {
     size = trace_get_item(&tr_entry);
 
     if (!size) {       /* no more instructions (trace_items) to simulate */
-      printf("+ Simulation terminates at cycle : %u\n", cycle_number);
+      printf("\nSimulation terminates at cycle : %u\n", cycle_number);
       break;
     }
-    else{              /* parse the next instruction to simulate */
+
+    else
       cycle_number++;
-      t_type = tr_entry->type;
-      t_sReg_a = tr_entry->sReg_a;
-      t_sReg_b = tr_entry->sReg_b;
-      t_dReg = tr_entry->dReg;
-      t_PC = tr_entry->PC;
-      t_Addr = tr_entry->Addr;
-    }
 
-  print_inst(trace_view_on);
-
+    if (trace_view_on)    // If trace view is on dump the contents of the buffers
+      print_buffers();    // to the screen
   }
 
   trace_uninit();
