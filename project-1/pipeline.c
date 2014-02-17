@@ -145,7 +145,7 @@ int print_buffers(){
       } // END switch
     }// END for (int i = 0; i < NUM_BUFFERS; i++)
   return 1;
-}// END print_inst(int trace_view_on)
+}// END print_buffer(int trace_view_on)
 
 int main(int argc, char **argv)
 {
@@ -190,8 +190,15 @@ int main(int argc, char **argv)
       break;
     }
 
-    else
+    // Move the instructions through the pipeline
+    else {
       cycle_number++;
+      buffer[4] = buffer[3];
+      buffer[3] = buffer[2];
+      buffer[2] = buffer[1];
+      buffer[1] = buffer[0];
+      buffer[0] = *tr_entry;
+    }
 
     if (trace_view_on)    // If trace view is on dump the contents of the buffers
       print_buffers();    // to the screen
