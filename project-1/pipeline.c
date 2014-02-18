@@ -189,7 +189,7 @@ int data_hazard(){
   // Compare the most recently read inst. to the inst. in the inst. fetch buffer
   // Stall if a i-type follows a load and it's source reg. is the same as
   // the dest. reg of the load
-/*  if (tr_entry->type == 2 && buffer[0].type == 3) {
+  if (tr_entry->type == 2 && buffer[0].type == 3) {
     if (tr_entry->sReg_a == buffer[0].dReg) {
       return 1;
     }
@@ -222,7 +222,7 @@ int data_hazard(){
   // trying to store the value loaded by the load inst.
   else if (tr_entry->type == 4 && buffer[0].type == 3)
     if (tr_entry->sReg_a == buffer[0].dReg)
-      return 1;*/
+      return 1;
 
   return 0;
 }
