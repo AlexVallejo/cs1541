@@ -270,7 +270,7 @@ int control_hazard(){
 }
 
 /*
- * Initialize every index in the branch prediction table to zero
+ * Initialize every index in the branch prediction table to -1
  */
 int init_branch_prediction_table(){
   for (int i = 0; i < BRANCH_PREDICTION_TABLE_SIZE; i++)
@@ -292,8 +292,9 @@ int branch_predict(int pc){
 /*
  * Updates the address with the address it jumped to
  */
-int update_branch(int pc, int addr){
+int update_branch(int pc, int addr) {
   int index = pc % 128;
+
   branch_prediction_table[index] = addr;
   return 0;
 }
@@ -367,46 +368,35 @@ int main(int argc, char **argv) {
       if (data_hazard())
         insert_stall();
 
-      // IF there is a control hazard add two no-ops
-      //  We add two no-ops by using a loop counter that counts to two and resets
-      //  after two more loops have been executed. In that time, no more new
-      //  inst's are read and no-ops are inserted in their place. Our
-      //  architecture requires that we insert two no-ops when assuming branches
-      //  are always taken
-      // Predict not taken
-      // TODO if branch is not taken reset back to -1
-      else if ((control_hazard() || branch_ops != 0) && branch_predict(tr_entry->PC) == -1){
-        // IF there is no prediction method, assume the branch is not taken
-        if (prediction_method == 0){
-          insert_squashed();
-          branch_ops++;
-        }
+      //Branch was previously predicted to be taken but is now not taken (2 noops)
+      else if (!control_hazard() && tr_entry->type == 5 && prediction_method == 1 && branch_predict(tr_entry->PC) != -1){
+        printf("\n\n**********Branch taken predicted incorrectly**********");
 
-        // ELSE prediction method is enabled and a control hazard was detected
-        //  indicating that we must update the prediction status for the branch
-        //  with the control hazard to taken
-        //  if it gets here we are assuming it was taken
-        else {
-          update_branch(tr_entry->PC, tr_entry->Addr);
-          branch_ops++;
-        }
+        if(branch_ops == 0)
+          update_branch(tr_entry->PC, -1);
 
-        //TODO Is this correct? NO.
-        // IF we have put two no-ops in the pipeline, reset the counter so no 
-        // more no-ops are inserted
+        insert_squashed();
+        branch_ops++;
+
+        //Both noops have been inserted
         if (branch_ops == 2)
           branch_ops = 0;
       }
 
-      //If the branch is predicted to be taken no instructions need to be squashed
-      //  we just start insterting the next instruction (in our simulation is is
-      //  equivilant to just returning to normal opperation b/c there arnt actaully
-      //  misc. instructions and *tr_entry is already the instruction on the other 
-      //  side of the branch
-      else if (prediction_method == 1 && branch_predict(tr_entry->PC) != -1){
-        printf("\n\n**********Branch predicted to be taken**********");
-        buffer[0] = *tr_entry;
+      //Branch is taken and we need to insert no ops
+      else if (control_hazard() || branch_ops != 0){
+        insert_squashed();
+        branch_ops++;
+
+        //Predicted not taken incorrectly (2 noops)
+        if (prediction_method == 1 && branch_ops == 0)
+          update_branch(tr_entry->PC, tr_entry->Addr);
+
+        //Both noops have been inserted
+        if (branch_ops == 2)
+          branch_ops = 0;
       }
+
       // There are no hazards detected, proceed as normal
       else {
         buffer[0] = *tr_entry;
