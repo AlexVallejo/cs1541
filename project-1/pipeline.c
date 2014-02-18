@@ -176,6 +176,33 @@ int insert_stall(){
   return 1;
 }
 
+int insert_squashed(){
+
+  // Init a new no-op to insert in the pipeline
+  struct trace_item squashed_inst;
+  squashed_inst.type = 0;
+  squashed_inst.sReg_a = 0;
+  squashed_inst.sReg_b = 0;
+  squashed_inst.dReg = 0;
+  squashed_inst.PC = 0;
+  squashed_inst.Addr = 0;
+
+  printf("\n*****Squashed Instruction*****\n");
+
+  // Print the pipeline as it would appear if the conflict was in the pipeline
+  printf("\nConflicting Pipeline: ");
+  buffer[0] = *tr_entry;
+  print_buffers();
+
+  // Print the pipeline as it appears after adding a stall
+  printf("\nResolved Pipeline: ");
+  buffer[0] = squashed_inst;
+  read_next_inst = 0;
+  print_buffers();
+
+  return 1;
+}
+
 /*
  * This function detects 4 kinds of data hazards where previous inst. depends
  * on data loaded by the current inst.
@@ -337,6 +364,7 @@ int main(int argc, char **argv) {
       if (data_hazard())
         insert_stall();
 
+      //  TODO SQUASHED INSTRUCTIONS MUST BE PRINTED AS "Squashed" PER THE INSTRUCTIONS
       // IF there is a control hazard add two no-ops
       //  We add two no-ops by using a loop counter that counts to two and resets
       //  after two more loops have been executed. In that time, no more new
@@ -347,7 +375,7 @@ int main(int argc, char **argv) {
       else if (control_hazard() || branch_ops != 0){
         // IF there is no prediction method, assume the branch is not taken
         if (prediction_method == 0){
-          insert_stall();
+          insert_squashed();
           branch_ops++;
         }
 
@@ -391,4 +419,3 @@ int main(int argc, char **argv) {
 
   exit(0);
 }
-
