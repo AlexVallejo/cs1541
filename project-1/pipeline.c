@@ -149,7 +149,7 @@ int print_buffers(){
 
 int insert_stall(){
 
-  // Init a new no-op in case we need to insert it in the pipeline
+  // Init a new no-op to insert in the pipeline
   struct trace_item no_op;
   no_op.type = 0;
   no_op.sReg_a = 0;
@@ -166,6 +166,37 @@ int insert_stall(){
   read_next_inst = 0; // Disable inst. reading
   printf("\nResolved Pipeline: ");
   print_buffers();
+
+  return 1;
+}
+
+int data_hazard(){
+
+  // Compare the most recently read inst. to the inst. in the inst. fetch buffer
+  // Stall if a i-type follows a load and it's source reg. is the same as
+  // the dest. reg of the load
+  if (tr_entry->type == 2 && buffer[0].type == 3) {
+    if (tr_entry->sReg_a == buffer[0].dReg) {
+      return 1;
+    }
+  }
+
+  // Stall if a r-type follows a load and either of it's source registers
+  // are the same as the dest reg of the load
+  else if (tr_entry->type == 1 && buffer[0].type == 3) {
+    if (tr_entry->sReg_a == buffer[0].dReg) {
+      return 1;
+    }
+
+    else if (tr_entry->sReg_b == buffer[0].dReg) {
+      return 1;
+    }
+  }
+
+  return 0;
+}
+
+int control_hazard(){
 
   return 1;
 }
@@ -222,26 +253,9 @@ int main(int argc, char **argv) {
       buffer[2] = buffer[1];
       buffer[1] = buffer[0];
 
-      // Compare the most recently read inst. to the inst. in the inst. fetch buffer
-      // Stall if a i-type follows a load and it's source reg. is the same as
-      // the dest. reg of the load
-      if (tr_entry->type == 2 && buffer[0].type == 3) {
-        if (tr_entry->sReg_a == buffer[0].dReg) {
-          insert_stall();
-        }
-      }
-
-      // Stall if a r-type follows a load and either of it's source registers
-      // are the same as the dest reg of the load
-      else if (tr_entry->type == 1 && buffer[0].type == 3) {
-        if (tr_entry->sReg_a == buffer[0].dReg) {
-          insert_stall();
-        }
-
-        else if (tr_entry->sReg_b == buffer[0].dReg) {
-          insert_stall();
-        }
-      }
+      //IF there is a data hazard insert a stall in the pipeline
+      if (data_hazard)
+        insert_stall();
 
       // There is no load-use conflict detected, proceed as normal
       else {
