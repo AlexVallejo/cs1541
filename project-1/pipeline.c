@@ -13,6 +13,7 @@
 
 #define TRACE_BUFSIZE 1024*1024
 #define NUM_BUFFERS 4
+#define BRANCH_PREDICTION_TABLE_SIZE 128
 
 static FILE *trace_fd;
 static int trace_buf_ptr;
@@ -21,8 +22,9 @@ static struct trace_item *trace_buf;
 
 unsigned int cycle_number = 0;
 
-struct trace_item buffer[NUM_BUFFERS];    // Pipeline Buffers
-struct trace_item *tr_entry;              // Temporary holding entry
+int branch_prediction_table[BRANCH_PREDICTION_TABLE_SIZE];  // Hastable used for branch prediction
+struct trace_item buffer[NUM_BUFFERS];                      // Pipeline Buffers
+struct trace_item *tr_entry;                                // Temporary holding entry
 
 int read_next_inst= 1;       // Boolean used to pause instruction reading when
                              // there is a load-use conflict
@@ -236,6 +238,35 @@ int control_hazard(){
   return 0;
 }
 
+/*
+ * Initialize every index in the branch prediction table to zero
+ */
+int init_branch_prediction_table(){
+  for (int i = 0; i < BRANCH_PREDICTION_TABLE_SIZE; i++)
+    branch_prediction_table[i] = 0;
+  return 0;
+}
+
+/*
+ * Every value in the branch prediction table is initialized to zero.
+ * If there is no data on the branch, it will return a value of 0 (not taken).
+ * If there is data on the branch, it will return the last state of the branch
+ *  taken (1) or not taken (0)
+ */
+int branch_predict(int addr){
+  int index = addr % 128;
+  return branch_prediction_table[index];
+}
+
+/*
+ * Updates the address with the given value
+ */
+int update_branch(int addr, int taken){
+  int index = addr % 128;
+  branch_prediction_table[index] = taken;
+  return 0;
+}
+
 int main(int argc, char **argv) {
   //struct trace_item *tr_entry;  // The inst. fetched from inst. mem.
   size_t size;
@@ -312,14 +343,32 @@ int main(int argc, char **argv) {
       //  architecture requires that we insert two no-ops when assuming branches
       //  are always taken
       // Predict not taken
-      else if (prediction_method == 0 && (control_hazard() || branch_ops != 0)){
-        insert_stall();
-        branch_ops++;
+      else if (control_hazard() || branch_ops != 0){
+        // IF there is no prediction method, assume the branch is not taken
+        if (prediction_method == 0){
+          insert_stall();
+          branch_ops++;
+        }
 
+        // ELSE prediction method is enabled and a control hazard was detected
+        //  indicating that we must update the prediction status for the branch
+        //  with the control hazard to taken
+        else {
+          update_branch(tr_entry->Addr, 1);
+          branch_ops++;
+        }
+
+        //TODO Is this correct?
+        // IF we have put two no-ops in the pipeline, reset the counter so no 
+        // more no-ops are inserted
         if (branch_ops == 2)
           branch_ops = 0;
       }
 
+      else if (prediction_method == 1 && branch_predict(tr_entry->Addr)){
+        printf("\n\n************Branch predicted to be taken");
+        //TODO implement more functionality here
+      }
       // There are no hazards detected, proceed as normal
       else {
         buffer[0] = *tr_entry;
