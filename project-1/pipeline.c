@@ -26,7 +26,7 @@ int branch_prediction_table[BRANCH_PREDICTION_TABLE_SIZE];  // Hastable used for
 struct trace_item buffer[NUM_BUFFERS];                      // Pipeline Buffers
 struct trace_item *tr_entry;                                // Temporary holding entry
 
-int read_next_inst= 1;       // Boolean used to pause instruction reading when
+int read_next_inst = 1;       // Boolean used to pause instruction reading when
                              // there is a load-use conflict
 
 int is_big_endian(void)
@@ -68,7 +68,7 @@ int trace_get_item(struct trace_item **item)
 {
   int n_items;
 
-  if (trace_buf_ptr == trace_buf_end) { /* if no more unprocessed items in the trace buffer, get new data  */
+  if (trace_buf_ptr == trace_buf_end) { /* if no more unprocessed items in the trace buffer, get new data */
     n_items = fread(trace_buf, sizeof(struct trace_item), TRACE_BUFSIZE, trace_fd);
     if (!n_items) return 0;       /* if no more items in the file, we are done */
 
@@ -187,6 +187,7 @@ int insert_stall(){
  *  @Return true if data hazard is detected and false otherwise
  */
 int data_hazard(){
+  //TODO ANYTHING follow a load is a data hazard. Are we taking this into account.
 
   // Compare the most recently read inst. to the inst. in the inst. fetch buffer
   // Stall if a i-type follows a load and it's source reg. is the same as
@@ -211,7 +212,7 @@ int data_hazard(){
 
   // Stall IF a load is followed by a branch inst. where the branch depends on
   // the value returned by the load inst.
-  // TODO insert 1 or two stalls?
+  // TODO insert 1 or two stalls? Mike's uses 1 as well.
   else if (tr_entry->type == 5 && buffer[0].type == 3){
     if (tr_entry->sReg_a == buffer[0].dReg)
       return 1;
@@ -268,14 +269,14 @@ int update_branch(int addr, int taken){
 }
 
 int main(int argc, char **argv) {
-  //struct trace_item *tr_entry;  // The inst. fetched from inst. mem.
+  //struct trace_item *tr_entry; // The inst. fetched from inst. mem.
   size_t size;
   char *trace_file_name;
-  int trace_view_on = 0;        // Set print's for each cycle off for default
-  int branch_ops = 0;           // Control to allow for two no-ops to follow an
-                                //  incorrect branch prediction
-  int prediction_method = 0;    // boolean to use or not use the 1-bit branch
-                                // predictor
+  int trace_view_on = 0;         // Set print's for each cycle off for default
+  int branch_ops = 0;            // Control to allow for two no-ops to follow an
+                                 // incorrect branch prediction
+  int prediction_method = 0;     // boolean to use or not use the 1-bit branch
+                                 // predictor
 
   // Explanations of each field are in trace_item.c
   unsigned char t_type = 0;
