@@ -160,11 +160,15 @@ int insert_stall(){
 
   printf("\n*****STALL*****\n");
 
+  // Print the pipeline as it would appear if the conflict was in the pipeline
   printf("\nConflicting Pipeline: ");
+  buffer[0] = *tr_entry;
   print_buffers();
-  buffer[0] = no_op;  // Insert a stall in the pipeline
-  read_next_inst = 0; // Disable inst. reading
+
+  // Print the pipeline as it appears after adding a stall
   printf("\nResolved Pipeline: ");
+  buffer[0] = no_op;
+  read_next_inst = 0;
   print_buffers();
 
   return 1;
