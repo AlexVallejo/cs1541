@@ -24,7 +24,7 @@ unsigned int cycle_number = 0;
 struct trace_item buffer[NUM_BUFFERS];    // Pipeline Buffers
 struct trace_item *tr_entry;              // Temporary holding entry
 
-int read_next_inst= 1;       // Boolean used to pause instruction reading when 
+int read_next_inst= 1;       // Boolean used to pause instruction reading when
                              // there is a load-use conflict
 
 int is_big_endian(void)
@@ -170,12 +170,22 @@ int insert_stall(){
   return 1;
 }
 
+/*
+ * This function detects 4 kinds of data hazards where previous inst. depends
+ * on data loaded by the current inst.
+ *  -load followed by an R-Type inst.
+ *  -load followed by an I-Type inst.
+ *  -load followed by a branch inst.
+ *  -load followed by a store inst.
+ *
+ *  @Return true if data hazard is detected and false otherwise
+ */
 int data_hazard(){
 
   // Compare the most recently read inst. to the inst. in the inst. fetch buffer
   // Stall if a i-type follows a load and it's source reg. is the same as
   // the dest. reg of the load
-  if (tr_entry->type == 2 && buffer[0].type == 3) {
+/*  if (tr_entry->type == 2 && buffer[0].type == 3) {
     if (tr_entry->sReg_a == buffer[0].dReg) {
       return 1;
     }
@@ -193,19 +203,42 @@ int data_hazard(){
     }
   }
 
+  // Stall IF a load is followed by a branch inst. where the branch depends on
+  // the value returned by the load inst.
+  // TODO insert 1 or two stalls?
+  else if (tr_entry->type == 5 && buffer[0].type == 3){
+    if (tr_entry->sReg_a == buffer[0].dReg)
+      return 1;
+
+    else if (tr_entry->sReg_b == buffer[0].dReg)
+      return 1;
+  }
+
+  // Stall IF a load is followed by a store instruction where the store is
+  // trying to store the value loaded by the load inst.
+  else if (tr_entry->type == 4 && buffer[0].type == 3)
+    if (tr_entry->sReg_a == buffer[0].dReg)
+      return 1;*/
+
   return 0;
 }
 
 int control_hazard(){
+  // RETURN true IF the inst in the buffer is a branch and next instruction
+  // executed is not next sequentially in the code
+  //printf("tr_entry->PC => %d", tr_entry->PC);
+  if (buffer[0].type == 5 && tr_entry->PC != (buffer[0].PC + 4))
+    return 1;
 
-  return 1;
+  return 0;
 }
 
 int main(int argc, char **argv) {
-  struct trace_item *tr_entry;  // The inst. fetched from inst. mem.
+  //struct trace_item *tr_entry;  // The inst. fetched from inst. mem.
   size_t size;
   char *trace_file_name;
   int trace_view_on = 0;        // Set print's for each cycle off for default
+  int branch_ops = 0;
 
   // Explanations of each field are in trace_item.c
   unsigned char t_type = 0;
@@ -239,7 +272,7 @@ int main(int argc, char **argv) {
   // it should have no-op's at the begining until the first 4 are executed and
   // no-ops at the end while the last 5 are being executed
   while (1) {
-    if (read_next_inst)
+    if (read_next_inst == 1 && branch_ops == 0)
       size = trace_get_item(&tr_entry);
 
     if (!size) {  // no more instructions (trace_items) to simulate
@@ -253,9 +286,18 @@ int main(int argc, char **argv) {
       buffer[2] = buffer[1];
       buffer[1] = buffer[0];
 
-      //IF there is a data hazard insert a stall in the pipeline
-      if (data_hazard)
+      // IF there is a data hazard insert a stall in the pipeline
+      if (data_hazard())
         insert_stall();
+
+      // IF there is a control hazard add two no-ops
+      if (control_hazard() || branch_ops != 0){
+        insert_stall();
+        branch_ops++;
+
+        if (branch_ops == 2)
+          branch_ops = 0;
+      }
 
       // There is no load-use conflict detected, proceed as normal
       else {
@@ -272,7 +314,7 @@ int main(int argc, char **argv) {
     if (trace_view_on) {
       print_buffers();
     }
-  }
+  }// END while (1)
 
   trace_uninit();
 
