@@ -111,7 +111,10 @@ int print_buffers(){
 
     switch (tr_entry->type) {
       case ti_NOP:
-        printf("NOP\n");
+        if(tr_entry->Addr == 1)
+          printf("SQUASHED\n");
+        else
+          printf("NOP\n");
         break;
       case ti_RTYPE:
         printf("RTYPE: ") ;
@@ -185,7 +188,7 @@ int insert_squashed(){
   squashed_inst.sReg_b = 0;
   squashed_inst.dReg = 0;
   squashed_inst.PC = 0;
-  squashed_inst.Addr = 0;
+  squashed_inst.Addr = 1;
 
   printf("\n*****Squashed Instruction*****\n");
 
