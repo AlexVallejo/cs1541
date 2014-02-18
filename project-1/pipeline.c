@@ -241,7 +241,10 @@ int main(int argc, char **argv) {
   size_t size;
   char *trace_file_name;
   int trace_view_on = 0;        // Set print's for each cycle off for default
-  int branch_ops = 0;
+  int branch_ops = 0;           // Control to allow for two no-ops to follow an
+                                //  incorrect branch prediction
+  int prediction_method = 0;    // boolean to use or not use the 1-bit branch
+                                // predictor
 
   // Explanations of each field are in trace_item.c
   unsigned char t_type = 0;
@@ -252,13 +255,22 @@ int main(int argc, char **argv) {
   unsigned int t_Addr = 0;
 
   if (argc == 1) {
-    fprintf(stdout, "\nUSAGE: tv <trace_file> <switch - any character>\n");
-    fprintf(stdout, "\n(switch) to turn on or off individual item view.\n\n");
+    fprintf(stdout, "\nUSAGE: tv <trace_file> <switch_1 - any character> <switch_2 - any character> \n");
+    fprintf(stdout, "\n(switch_1) to turn on or off individual item view.\n\n");
+    fprintf(stdout, "\n(switch_2) to turn on or off the one branch predictor.\n\n");
     exit(0);
   }
 
+  // Parse command line arguments
   trace_file_name = argv[1];
-  if (argc == 3) trace_view_on = atoi(argv[2]) ;
+  if (argc == 3)
+    trace_view_on = atoi(argv[2]);
+
+  else if (argc == 4){
+    trace_view_on = atoi(argv[2]);
+    prediction_method = atoi(argv[3]);
+  }
+
 
   fprintf(stdout, "\n ** opening file %s\n", trace_file_name);
 
@@ -294,7 +306,13 @@ int main(int argc, char **argv) {
         insert_stall();
 
       // IF there is a control hazard add two no-ops
-      else if (control_hazard() || branch_ops != 0){
+      //  We add two no-ops by using a loop counter that counts to two and resets
+      //  after two more loops have been executed. In that time, no more new
+      //  inst's are read and no-ops are inserted in their place. Our
+      //  architecture requires that we insert two no-ops when assuming branches
+      //  are always taken
+      // Predict not taken
+      else if (prediction_method == 0 && (control_hazard() || branch_ops != 0)){
         insert_stall();
         branch_ops++;
 
@@ -302,7 +320,7 @@ int main(int argc, char **argv) {
           branch_ops = 0;
       }
 
-      // There is no load-use conflict detected, proceed as normal
+      // There are no hazards detected, proceed as normal
       else {
         buffer[0] = *tr_entry;
       }
