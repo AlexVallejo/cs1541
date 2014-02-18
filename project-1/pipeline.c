@@ -178,7 +178,7 @@ int insert_stall(){
 
 int insert_squashed(){
 
-  // Init a new no-op to insert in the pipeline
+  // Init a new squashed instruction to insert in the pipeline
   struct trace_item squashed_inst;
   squashed_inst.type = 0;
   squashed_inst.sReg_a = 0;
