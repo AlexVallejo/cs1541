@@ -230,8 +230,7 @@ int data_hazard(){
 int control_hazard(){
   // RETURN true IF the inst in the buffer is a branch and next instruction
   // executed is not next sequentially in the code
-  //printf("tr_entry->PC => %d", tr_entry->PC);
-  if (buffer[0].type == 5 && tr_entry->PC != (buffer[0].PC + 4))
+  if (buffer[0].type == 5 && tr_entry->PC != (buffer[0].PC + 4) && tr_entry->PC != buffer[0].PC)
     return 1;
 
   return 0;
@@ -295,7 +294,7 @@ int main(int argc, char **argv) {
         insert_stall();
 
       // IF there is a control hazard add two no-ops
-      if (control_hazard() || branch_ops != 0){
+      else if (control_hazard() || branch_ops != 0){
         insert_stall();
         branch_ops++;
 
