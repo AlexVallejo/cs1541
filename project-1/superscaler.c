@@ -14,6 +14,7 @@
 #define TRACE_BUFSIZE 1024*1024
 #define NUM_BUFFERS 4
 #define BRANCH_PREDICTION_TABLE_SIZE 128
+#define INSTRUCTION_BUFFER_LENGTH 2
 
 static FILE *trace_fd;
 static int trace_buf_ptr;
@@ -23,8 +24,9 @@ static struct trace_item *trace_buf;
 unsigned int cycle_number = 0;
 
 int branch_prediction_table[BRANCH_PREDICTION_TABLE_SIZE];       // Hastable used for branch prediction (if taken or not)
-struct trace_item buffer[NUM_BUFFERS];                           // Pipeline Buffers
-struct trace_item buffer[NUM_BUFFERS];                           // Pipeline Buffers
+int instruction_buffer[INSTRUCTION_BUFFER_LENGTH];               // Instruction Buffer
+struct trace_item buffer_ALU[NUM_BUFFERS];                       // Pipeline Buffers
+struct trace_item buffer_LS[NUM_BUFFERS];                        // Pipeline Buffers
 struct trace_item *tr_entry_ALU;                                 // Temporary holding entry
 struct trace_item *tr_entry_LS;                                  // Temporary holding entry
 
