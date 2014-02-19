@@ -302,8 +302,8 @@ int main(int argc, char **argv) {
 
   if (argc == 1) {
     fprintf(stdout, "\nUSAGE: tv <trace_file> <switch_1 - any character> <switch_2 - any character> \n");
-    fprintf(stdout, "\n(switch_1) to turn on or off individual item view.\n\n");
-    fprintf(stdout, "\n(switch_2) to turn on or off the one branch predictor.\n\n");
+    fprintf(stdout, "\n(switch_1) to turn on or off the 1-bit branch predictor.\n\n");
+    fprintf(stdout, "\n(switch_2) to turn on or off individual item view.\n\n");
     exit(0);
   }
 
@@ -313,10 +313,9 @@ int main(int argc, char **argv) {
     trace_view_on = atoi(argv[2]);
 
   else if (argc == 4){
-    trace_view_on = atoi(argv[2]);
-    prediction_method = atoi(argv[3]);
+    prediction_method = atoi(argv[2]);
+    trace_view_on = atoi(argv[3]);
   }
-
 
   fprintf(stdout, "\n ** opening file %s\n", trace_file_name);
 
