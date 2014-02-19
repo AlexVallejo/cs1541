@@ -260,9 +260,9 @@ int insert_squashed(){
 int control_hazard(){
   // RETURN true IF the inst in the buffer is a branch and next instruction
   // executed is not next sequentially in the code
-  if (buffer_ALU[0].type == 5 && instruction_buffer[0]->PC != (buffer_ALU[0].PC + 4))
+  if (buffer_ALU[0].type == 5 && instruction_buffer[0].PC != (buffer_ALU[0].PC + 4))
     return 1;
-  if (buffer_ALU[0].type == 5 && instruction_buffer[1]->PC != (buffer_ALU[0].PC + 4))
+  if (buffer_ALU[0].type == 5 && instruction_buffer[1].PC != (buffer_ALU[0].PC + 4))
     return 1;
   return 0;
 }
@@ -514,10 +514,10 @@ int main(int argc, char **argv) {
   while (1) {
     if (read_next_inst == 1 && branch_ops == 0)
       size = trace_get_item(&tr_entry);
-      instruction_buffer[0] = tr_entry;
+      instruction_buffer[0] = *tr_entry;
       if(!size){
         size = trace_get_item(&tr_entry);
-        instruction_buffer[1] = tr_entry;
+        instruction_buffer[1] = *tr_entry;
       }
 
     if (!size) {  // no more instructions (trace_items) to simulate
@@ -569,8 +569,14 @@ int main(int argc, char **argv) {
         //issue both
         if(!load_use_dependance(0) && !load_use_dependance(1)){
           if(!inst_buffer_inter_dependant()){
-            buffer_ALU[0] = //THE ONE THAT GOES HERE
-            buffer_LS[0] = //THE ONE THAT GOES HERE
+            if(instruction_buffer[0].type == 3 || instruction_buffer[0].type == 4){
+              buffer_ALU[0] = instruction_buffer[1];
+              buffer_LS[0] = instruction_buffer[0];
+            }
+            else{
+              buffer_ALU[0] = instruction_buffer[0];
+              buffer_LS[0] = instruction_buffer[1];
+            }
           }
         }
         else if(!load_use_dependance(0)){
@@ -593,7 +599,8 @@ int main(int argc, char **argv) {
     }// END ELSE there are still more inst's left to read
 
     if (trace_view_on) {
-      print_buffers();
+      print_buffers_ALU();
+      print_buffers_LS();
     }
   }// END while (1)
 
