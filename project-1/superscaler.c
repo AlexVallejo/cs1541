@@ -24,11 +24,10 @@ static struct trace_item *trace_buf;
 unsigned int cycle_number = 0;
 
 int branch_prediction_table[BRANCH_PREDICTION_TABLE_SIZE];       // Hastable used for branch prediction (if taken or not)
-struct trace_item instruction_buffer[INSTRUCTION_BUFFER_LENGTH];               // Instruction Buffer
+struct trace_item instruction_buffer[INSTRUCTION_BUFFER_LENGTH]; // Instruction Buffer
 struct trace_item buffer_ALU[NUM_BUFFERS];                       // Pipeline Buffers
 struct trace_item buffer_LS[NUM_BUFFERS];                        // Pipeline Buffers
-struct trace_item *tr_entry_ALU;                                 // Temporary holding entry
-struct trace_item *tr_entry_LS;                                  // Temporary holding entry
+struct trace_item *tr_entry;                                     // Temporary holding entry
 
 int read_next_inst = 1;       // Boolean used to pause instruction reading when
                               // there is a load-use conflict
@@ -96,7 +95,7 @@ int print_buffers_LS(){
   printf("\n---------------------CYCLE #%d-------------------\n",cycle_number);
 
   for (int i = 0; i < NUM_BUFFERS; i++){
-    tr_entry_LS = &buffer[i];
+    tr_entry = &buffer[i];
 
     switch (i) {
       case 0:
@@ -240,7 +239,7 @@ int insert_stall(int buffer_select){
   return 1;
 }
 
-int insert_squashed(int buffer_select){
+int insert_squashed(){
 
   // Init a new squashed instruction to insert in the pipeline
   struct trace_item squashed_inst;
@@ -253,11 +252,19 @@ int insert_squashed(int buffer_select){
 
   printf("\n**************** CONTROL HAZARD DETECTED *******************\n");
 
-  if(buffer_select == 0)
-    buffer_ALU[0] = squashed_inst;
-  else
-    buffer_LS[0] = squashed_inst;
+  buffer_ALU[0] = squashed_inst;
+  buffer_LS[0] = squashed_inst;
   return 1;
+}
+
+int control_hazard(){
+  // RETURN true IF the inst in the buffer is a branch and next instruction
+  // executed is not next sequentially in the code
+  if (buffer_ALU[0].type == 5 && instruction_buffer[0]->PC != (buffer_ALU[0].PC + 4))
+    return 1;
+  if (buffer_ALU[0].type == 5 && instruction_buffer[1]->PC != (buffer_ALU[0].PC + 4))
+    return 1;
+  return 0;
 }
 
 /*
@@ -507,6 +514,11 @@ int main(int argc, char **argv) {
   while (1) {
     if (read_next_inst == 1 && branch_ops == 0)
       size = trace_get_item(&tr_entry);
+      instruction_buffer[0] = tr_entry;
+      if(!size){
+        size = trace_get_item(&tr_entry);
+        instruction_buffer[1] = tr_entry;
+      }
 
     if (!size) {  // no more instructions (trace_items) to simulate
       printf("\nSimulation terminates at cycle : %u\n", cycle_number);
@@ -515,20 +527,20 @@ int main(int argc, char **argv) {
 
     else {  // Move the instructions through the pipeline
       cycle_number++;
-      buffer[3] = buffer[2];
-      buffer[2] = buffer[1];
-      buffer[1] = buffer[0];
+      buffer_ALU[3] = buffer_ALU[2];
+      buffer_ALU[2] = buffer_ALU[1];
+      buffer_ALU[1] = buffer_ALU[0];
 
-      // IF there is a data hazard insert a stall in the pipeline
-      if (data_hazard())
-        insert_stall();
+      buffer_LS[3] = buffer_LS[2];
+      buffer_LS[2] = buffer_LS[1];
+      buffer_LS[1] = buffer_LS[0];
 
       //Branch was previously predicted to be taken but is now not taken (2 noops)
-      else if (!control_hazard() && tr_entry->type == 5 && prediction_method == 1 && branch_predict(tr_entry->PC) != -1){
+      if (!control_hazard() && buffer_ALU[0].type == 5 && prediction_method == 1 && branch_predict(buffer_ALU[0].PC) != -1){
         printf("\n\n**********Branch taken predicted incorrectly**********");
 
         if(branch_ops == 0)
-          update_branch(tr_entry->PC, -1);
+          update_branch(buffer_ALU[0].PC, -1);
 
         insert_squashed();
         branch_ops++;
@@ -545,7 +557,7 @@ int main(int argc, char **argv) {
 
         //Predicted not taken incorrectly (2 noops)
         if (prediction_method == 1 && branch_ops == 0)
-          update_branch(tr_entry->PC, tr_entry->Addr);
+          update_branch(buffer_ALU[0].PC, buffer_ALU[0].Addr);
 
         //Both noops have been inserted
         if (branch_ops == 2)
@@ -554,7 +566,27 @@ int main(int argc, char **argv) {
 
       // There are no hazards detected, proceed as normal
       else {
-        buffer[0] = *tr_entry;
+        //issue both
+        if(!load_use_dependance(0) && !load_use_dependance(1)){
+          if(!inst_buffer_inter_dependant()){
+            buffer_ALU[0] = //THE ONE THAT GOES HERE
+            buffer_LS[0] = //THE ONE THAT GOES HERE
+          }
+        }
+        else if(!load_use_dependance(0)){
+          if(instruction_buffer[0].type == 3 || instruction_buffer[0].type == 4){
+            buffer_LS[0] = instruction_buffer[0];
+            insert_stall(0);
+          }
+          else{
+            buffer_ALU[0] = instruction_buffer[0];
+            insert_stall(1);
+          }
+        }
+        else{
+          insert_stall(0);
+          insert_stall(1);
+        }
         read_next_inst = 1;
       }
 
