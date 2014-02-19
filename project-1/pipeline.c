@@ -163,18 +163,18 @@ int insert_stall(){
   no_op.PC = 0;
   no_op.Addr = 0;
 
-  printf("\n*****STALL*****\n");
+  printf("\n********************* DATA HAZARD DETECTED *************************\n");
 
   // Print the pipeline as it would appear if the conflict was in the pipeline
-  printf("\nConflicting Pipeline: ");
-  buffer[0] = *tr_entry;
-  print_buffers();
+  //printf("\nConflicting Pipeline: ");
+  //buffer[0] = *tr_entry;
+  //print_buffers();
 
   // Print the pipeline as it appears after adding a stall
-  printf("\nResolved Pipeline: ");
+  //printf("\nResolved Pipeline: ");
   buffer[0] = no_op;
-  read_next_inst = 0;
-  print_buffers();
+  //read_next_inst = 0;
+  //print_buffers();
 
   return 1;
 }
@@ -190,18 +190,18 @@ int insert_squashed(){
   squashed_inst.PC = 0;
   squashed_inst.Addr = 1;
 
-  printf("\n*****Squashed Instruction*****\n");
+  printf("\n**************** CONTROL HAZARD DETECTED *******************\n");
 
   // Print the pipeline as it would appear if the conflict was in the pipeline
-  printf("\nConflicting Pipeline: ");
-  buffer[0] = *tr_entry;
-  print_buffers();
+  //printf("\nConflicting Pipeline: ");
+  //buffer[0] = *tr_entry;
+  //print_buffers();
 
   // Print the pipeline as it appears after adding a stall
-  printf("\nResolved Pipeline: ");
+  //printf("\nResolved Pipeline: ");
   buffer[0] = squashed_inst;
-  read_next_inst = 0;
-  print_buffers();
+  //read_next_inst = 0;
+  //print_buffers();
 
   return 1;
 }
@@ -400,12 +400,13 @@ int main(int argc, char **argv) {
       // There are no hazards detected, proceed as normal
       else {
         buffer[0] = *tr_entry;
+        read_next_inst = 1;
       }
 
       // IF the most recently read instruction was added to the pipeline,
       // re-enable instruction reading
-      if (buffer[0].PC == tr_entry->PC)
-        read_next_inst = 1;
+      //if (buffer[0].PC == tr_entry->PC)
+      //  read_next_inst = 1;
 
     }// END ELSE there are still more inst's left to read
 
