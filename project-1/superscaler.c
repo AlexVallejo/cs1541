@@ -115,7 +115,7 @@ int print_buffers_LS(){
 
     switch (tr_entry_LS->type) {
       case ti_NOP:
-        if(tr_entry->Addr == 1)
+        if(tr_entry_LS->Addr == 1)
           printf("SQUASHED\n");
         else
           printf("NOP\n");
@@ -154,6 +154,7 @@ int print_buffers_LS(){
       } // END switch
     }// END for (int i = 0; i < NUM_BUFFERS; i++)
   return 1;
+}
 
 int print_buffers_ALU(){
 
