@@ -24,7 +24,9 @@ unsigned int cycle_number = 0;
 
 int branch_prediction_table[BRANCH_PREDICTION_TABLE_SIZE];       // Hastable used for branch prediction (if taken or not)
 struct trace_item buffer[NUM_BUFFERS];                           // Pipeline Buffers
-struct trace_item *tr_entry;                                     // Temporary holding entry
+struct trace_item buffer[NUM_BUFFERS];                           // Pipeline Buffers
+struct trace_item *tr_entry_ALU;                                 // Temporary holding entry
+struct trace_item *tr_entry_LS;                                  // Temporary holding entry
 
 int read_next_inst = 1;       // Boolean used to pause instruction reading when
                               // there is a load-use conflict
@@ -87,12 +89,12 @@ int trace_get_item(struct trace_item **item)
   return 1;
 }
 
-int print_buffers(){
+int print_buffers_LS(){
 
   printf("\n---------------------CYCLE #%d-------------------\n",cycle_number);
 
   for (int i = 0; i < NUM_BUFFERS; i++){
-    tr_entry = &buffer[i];
+    tr_entry_LS = &buffer[i];
 
     switch (i) {
       case 0:
@@ -109,7 +111,7 @@ int print_buffers(){
         break;
     }
 
-    switch (tr_entry->type) {
+    switch (tr_entry_LS->type) {
       case ti_NOP:
         if(tr_entry->Addr == 1)
           printf("SQUASHED\n");
@@ -118,34 +120,98 @@ int print_buffers(){
         break;
       case ti_RTYPE:
         printf("RTYPE: ") ;
-        printf("(PC: %x)(sReg_a: %d)(sReg_b: %d)(dReg: %d)\n", tr_entry->PC, tr_entry->sReg_a, tr_entry->sReg_b, tr_entry->dReg);
+        printf("(PC: %x)(sReg_a: %d)(sReg_b: %d)(dReg: %d)\n", tr_entry_LS->PC, tr_entry_LS->sReg_a, tr_entry_LS->sReg_b, tr_entry_LS->dReg);
         break;
       case ti_ITYPE:
         printf("ITYPE:") ;
-        printf(" (PC: %x)(sReg_a: %d)(dReg: %d)(addr: %x)\n", tr_entry->PC, tr_entry->sReg_a, tr_entry->dReg, tr_entry->Addr);
+        printf(" (PC: %x)(sReg_a: %d)(dReg: %d)(addr: %x)\n", tr_entry_LS->PC, tr_entry_LS->sReg_a, tr_entry_LS->dReg, tr_entry_LS->Addr);
         break;
       case ti_LOAD:
         printf("LOAD:") ;
-        printf(" (PC: %x)(sReg_a: %d)(dReg: %d)(addr: %x)\n", tr_entry->PC, tr_entry->sReg_a, tr_entry->dReg, tr_entry->Addr);
+        printf(" (PC: %x)(sReg_a: %d)(dReg: %d)(addr: %x)\n", tr_entry_LS->PC, tr_entry_LS->sReg_a, tr_entry_LS->dReg, tr_entry_LS->Addr);
         break;
       case ti_STORE:
         printf("STORE:") ;
-        printf(" (PC: %x)(sReg_a: %d)(sReg_b: %d)(addr: %x)\n", tr_entry->PC, tr_entry->sReg_a, tr_entry->sReg_b, tr_entry->Addr);
+        printf(" (PC: %x)(sReg_a: %d)(sReg_b: %d)(addr: %x)\n", tr_entry_LS->PC, tr_entry_LS->sReg_a, tr_entry_LS->sReg_b, tr_entry_LS->Addr);
         break;
       case ti_BRANCH:
         printf("BRANCH:") ;
-        printf(" (PC: %x)(sReg_a: %d)(sReg_b: %d)(addr: %x)\n", tr_entry->PC, tr_entry->sReg_a, tr_entry->sReg_b, tr_entry->Addr);
+        printf(" (PC: %x)(sReg_a: %d)(sReg_b: %d)(addr: %x)\n", tr_entry_LS->PC, tr_entry_LS->sReg_a, tr_entry_LS->sReg_b, tr_entry_LS->Addr);
         break;
       case ti_JTYPE:
         printf("JTYPE:") ;
-        printf(" (PC: %x)(addr: %x)\n", tr_entry->PC,tr_entry->Addr);
+        printf(" (PC: %x)(addr: %x)\n", tr_entry_LS->PC,tr_entry_LS->Addr);
         break;
       case ti_SPECIAL:
         printf("SPECIAL\n") ;
         break;
       case ti_JRTYPE:
         printf("JRTYPE:") ;
-        printf(" (PC: %x) (sReg_a: %d)(addr: %x)\n", tr_entry->PC, tr_entry->dReg, tr_entry->Addr);
+        printf(" (PC: %x) (sReg_a: %d)(addr: %x)\n", tr_entry_LS->PC, tr_entry_LS->dReg, tr_entry_LS->Addr);
+        break;
+      } // END switch
+    }// END for (int i = 0; i < NUM_BUFFERS; i++)
+  return 1;
+
+int print_buffers_ALU(){
+
+  printf("\n---------------------CYCLE #%d-------------------\n",cycle_number);
+
+  for (int i = 0; i < NUM_BUFFERS; i++){
+    tr_entry_ALU = &buffer[i];
+
+    switch (i) {
+      case 0:
+        printf("%-6s => ", "IF/ID");
+        break;
+      case 1:
+        printf("%-6s => ", "ID/EX");
+        break;
+      case 2:
+        printf("%-6s => ","EX/MEM");
+        break;
+      case 3:
+        printf("%-6s => ","MEM/WB");
+        break;
+    }
+
+    switch (tr_entry_ALU->type) {
+      case ti_NOP:
+        if(tr_entry_ALU->Addr == 1)
+          printf("SQUASHED\n");
+        else
+          printf("NOP\n");
+        break;
+      case ti_RTYPE:
+        printf("RTYPE: ") ;
+        printf("(PC: %x)(sReg_a: %d)(sReg_b: %d)(dReg: %d)\n", tr_entry_ALU->PC, tr_entry_ALU->sReg_a, tr_entry_ALU->sReg_b, tr_entry_ALU->dReg);
+        break;
+      case ti_ITYPE:
+        printf("ITYPE:") ;
+        printf(" (PC: %x)(sReg_a: %d)(dReg: %d)(addr: %x)\n", tr_entry_ALU->PC, tr_entry_ALU->sReg_a, tr_entry_ALU->dReg, tr_entry_ALU->Addr);
+        break;
+      case ti_LOAD:
+        printf("LOAD:") ;
+        printf(" (PC: %x)(sReg_a: %d)(dReg: %d)(addr: %x)\n", tr_entry_ALU->PC, tr_entry_ALU->sReg_a, tr_entry_ALU->dReg, tr_entry_ALU->Addr);
+        break;
+      case ti_STORE:
+        printf("STORE:") ;
+        printf(" (PC: %x)(sReg_a: %d)(sReg_b: %d)(addr: %x)\n", tr_entry_ALU->PC, tr_entry_ALU->sReg_a, tr_entry_ALU->sReg_b, tr_entry_ALU->Addr);
+        break;
+      case ti_BRANCH:
+        printf("BRANCH:") ;
+        printf(" (PC: %x)(sReg_a: %d)(sReg_b: %d)(addr: %x)\n", tr_entry_ALU->PC, tr_entry_ALU->sReg_a, tr_entry_ALU->sReg_b, tr_entry_ALU->Addr);
+        break;
+      case ti_JTYPE:
+        printf("JTYPE:") ;
+        printf(" (PC: %x)(addr: %x)\n", tr_entry_ALU->PC,tr_entry_ALU->Addr);
+        break;
+      case ti_SPECIAL:
+        printf("SPECIAL\n") ;
+        break;
+      case ti_JRTYPE:
+        printf("JRTYPE:") ;
+        printf(" (PC: %x) (sReg_a: %d)(addr: %x)\n", tr_entry_ALU->PC, tr_entry_ALU->dReg, tr_entry_ALU->Addr);
         break;
       } // END switch
     }// END for (int i = 0; i < NUM_BUFFERS; i++)
@@ -165,17 +231,7 @@ int insert_stall(){
 
   printf("\n********************* DATA HAZARD DETECTED *************************\n");
 
-  // Print the pipeline as it would appear if the conflict was in the pipeline
-  //printf("\nConflicting Pipeline: ");
-  //buffer[0] = *tr_entry;
-  //print_buffers();
-
-  // Print the pipeline as it appears after adding a stall
-  //printf("\nResolved Pipeline: ");
   buffer[0] = no_op;
-  //read_next_inst = 0;
-  //print_buffers();
-
   return 1;
 }
 
@@ -192,81 +248,8 @@ int insert_squashed(){
 
   printf("\n**************** CONTROL HAZARD DETECTED *******************\n");
 
-  // Print the pipeline as it would appear if the conflict was in the pipeline
-  //printf("\nConflicting Pipeline: ");
-  //buffer[0] = *tr_entry;
-  //print_buffers();
-
-  // Print the pipeline as it appears after adding a stall
-  //printf("\nResolved Pipeline: ");
   buffer[0] = squashed_inst;
-  //read_next_inst = 0;
-  //print_buffers();
-
   return 1;
-}
-
-/*
- * This function detects 4 kinds of data hazards where previous inst. depends
- * on data loaded by the current inst.
- *  -load followed by an R-Type inst.
- *  -load followed by an I-Type inst.
- *  -load followed by a branch inst.
- *  -load followed by a store inst.
- *
- *  @Return true if data hazard is detected and false otherwise
- */
-int data_hazard(){
-  //TODO ANYTHING follow a load is a data hazard. Are we taking this into account.
-
-  // Compare the most recently read inst. to the inst. in the inst. fetch buffer
-  // Stall if a i-type follows a load and it's source reg. is the same as
-  // the dest. reg of the load
-  if (tr_entry->type == 2 && buffer[0].type == 3) {
-    if (tr_entry->sReg_a == buffer[0].dReg) {
-      return 1;
-    }
-  }
-
-  // Stall if a r-type follows a load and either of it's source registers
-  // are the same as the dest reg of the load
-  else if (tr_entry->type == 1 && buffer[0].type == 3) {
-    if (tr_entry->sReg_a == buffer[0].dReg) {
-      return 1;
-    }
-
-    else if (tr_entry->sReg_b == buffer[0].dReg) {
-      return 1;
-    }
-  }
-
-  // Stall IF a load is followed by a branch inst. where the branch depends on
-  // the value returned by the load inst.
-  // TODO insert 1 or two stalls? Mike's uses 1 as well.
-  else if (tr_entry->type == 5 && buffer[0].type == 3){
-    if (tr_entry->sReg_a == buffer[0].dReg)
-      return 1;
-
-    else if (tr_entry->sReg_b == buffer[0].dReg)
-      return 1;
-  }
-
-  // Stall IF a load is followed by a store instruction where the store is
-  // trying to store the value loaded by the load inst.
-  else if (tr_entry->type == 4 && buffer[0].type == 3)
-    if (tr_entry->sReg_a == buffer[0].dReg)
-      return 1;
-
-  return 0;
-}
-
-int control_hazard(){
-  // RETURN true IF the inst in the buffer is a branch and next instruction
-  // executed is not next sequentially in the code
-  if (buffer[0].type == 5 && tr_entry->PC != (buffer[0].PC + 4) && tr_entry->PC != buffer[0].PC)
-    return 1;
-
-  return 0;
 }
 
 /*
@@ -300,7 +283,6 @@ int update_branch(int pc, int addr) {
 }
 
 int main(int argc, char **argv) {
-  //struct trace_item *tr_entry; // The inst. fetched from inst. mem.
   size_t size;
   char *trace_file_name;
   int trace_view_on = 0;         // Set print's for each cycle off for default
@@ -309,13 +291,6 @@ int main(int argc, char **argv) {
   int prediction_method = 0;     // boolean to use or not use the 1-bit branch
                                  // predictor
 
-  // Explanations of each field are in trace_item.c
-  unsigned char t_type = 0;
-  unsigned char t_sReg_a= 0;
-  unsigned char t_sReg_b= 0;
-  unsigned char t_dReg= 0;
-  unsigned int t_PC = 0;
-  unsigned int t_Addr = 0;
 
   if (argc == 1) {
     fprintf(stdout, "\nUSAGE: tv <trace_file> <switch_1 - any character> <switch_2 - any character> \n");
@@ -402,11 +377,6 @@ int main(int argc, char **argv) {
         buffer[0] = *tr_entry;
         read_next_inst = 1;
       }
-
-      // IF the most recently read instruction was added to the pipeline,
-      // re-enable instruction reading
-      //if (buffer[0].PC == tr_entry->PC)
-      //  read_next_inst = 1;
 
     }// END ELSE there are still more inst's left to read
 
