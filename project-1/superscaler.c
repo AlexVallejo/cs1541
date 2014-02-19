@@ -221,7 +221,7 @@ int print_buffers_ALU(){
   return 1;
 }// END print_buffer(int trace_view_on)
 
-int insert_stall(){
+int insert_stall(int buffer_select){
 
   // Init a new no-op to insert in the pipeline
   struct trace_item no_op;
@@ -233,12 +233,14 @@ int insert_stall(){
   no_op.Addr = 0;
 
   printf("\n********************* DATA HAZARD DETECTED *************************\n");
-
-  buffer[0] = no_op;
+  if(buffer_select == 0)
+    buffer_ALU[0] = no_op;
+  else
+    buffer_LS[0] = no_op;
   return 1;
 }
 
-int insert_squashed(){
+int insert_squashed(int buffer_select){
 
   // Init a new squashed instruction to insert in the pipeline
   struct trace_item squashed_inst;
@@ -251,7 +253,10 @@ int insert_squashed(){
 
   printf("\n**************** CONTROL HAZARD DETECTED *******************\n");
 
-  buffer[0] = squashed_inst;
+  if(buffer_select == 0)
+    buffer_ALU[0] = squashed_inst;
+  else
+    buffer_LS[0] = squashed_inst;
   return 1;
 }
 
