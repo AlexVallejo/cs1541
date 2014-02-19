@@ -309,18 +309,10 @@ int main(int argc, char **argv) {
   int prediction_method = 0;     // boolean to use or not use the 1-bit branch
                                  // predictor
 
-  // Explanations of each field are in trace_item.c
-  unsigned char t_type = 0;
-  unsigned char t_sReg_a= 0;
-  unsigned char t_sReg_b= 0;
-  unsigned char t_dReg= 0;
-  unsigned int t_PC = 0;
-  unsigned int t_Addr = 0;
-
   if (argc == 1) {
     fprintf(stdout, "\nUSAGE: tv <trace_file> <switch_1 - any character> <switch_2 - any character> \n");
-    fprintf(stdout, "\n(switch_1) to turn on or off individual item view.\n\n");
-    fprintf(stdout, "\n(switch_2) to turn on or off the one branch predictor.\n\n");
+    fprintf(stdout, "\n(switch_1) to turn on or off the one branch predictor.\n\n");
+    fprintf(stdout, "\n(switch_2) to turn on or off individual item view.\n\n");
     exit(0);
   }
 
@@ -330,8 +322,8 @@ int main(int argc, char **argv) {
     trace_view_on = atoi(argv[2]);
 
   else if (argc == 4){
-    trace_view_on = atoi(argv[2]);
-    prediction_method = atoi(argv[3]);
+    prediction_method = atoi(argv[2]);
+    trace_view_on = atoi(argv[3]);
   }
 
 
