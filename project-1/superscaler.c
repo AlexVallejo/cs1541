@@ -24,7 +24,7 @@ static struct trace_item *trace_buf;
 unsigned int cycle_number = 0;
 
 int branch_prediction_table[BRANCH_PREDICTION_TABLE_SIZE];       // Hastable used for branch prediction (if taken or not)
-int instruction_buffer[INSTRUCTION_BUFFER_LENGTH];               // Instruction Buffer
+struct trace_item instruction_buffer[INSTRUCTION_BUFFER_LENGTH];               // Instruction Buffer
 struct trace_item buffer_ALU[NUM_BUFFERS];                       // Pipeline Buffers
 struct trace_item buffer_LS[NUM_BUFFERS];                        // Pipeline Buffers
 struct trace_item *tr_entry_ALU;                                 // Temporary holding entry
@@ -287,6 +287,179 @@ int update_branch(int pc, int addr) {
   int index = pc % 128;
 
   branch_prediction_table[index] = addr;
+  return 0;
+}
+
+int load_use_dependance(int index){
+
+  if (buffer_LS[0].type != 3)
+    return 0; // There is no data dependance
+
+  //instruction_buffer[index] = R-Type instruction
+  if (instruction_buffer[index].type == 1){
+    if (   buffer_LS[0].dReg == instruction_buffer[index].sReg_a
+        || buffer_LS[0].dReg == instruction_buffer[index].sReg_b)
+        return 1; // There is a data dependance
+  }
+
+  //instruction_buffer[index] = I-Type Instruction
+  if (instruction_buffer[index].type == 2) {
+    if (buffer_LS[0].dReg == instruction_buffer[index].sReg_a)
+        return 1; // There is a data dependance
+  }
+
+  //instruction_buffer[index] = Load Instruction
+  if (instruction_buffer[index].type == 3) {
+    if (buffer_LS[0].dReg == instruction_buffer[index].sReg_a)
+        return 1; // There is a data dependance
+  }
+
+  //instruction_buffer[index] = Store Instruction
+  if (instruction_buffer[index].type == 4) {
+    if (buffer_LS[0].dReg == instruction_buffer[index].sReg_a)
+        return 1; // There is a data dependance
+  }
+
+  //instruction_buffer[index] = Branch Instruction
+  if (instruction_buffer[index].type == 5) {
+    if (buffer_LS[0].dReg == instruction_buffer[index].sReg_a)
+        return 1; // There is a data dependance
+  }
+
+  //instruction_buffer[index] = Branch Instruction
+  if (instruction_buffer[index].type == 8) {
+    if (buffer_LS[0].dReg == instruction_buffer[index].sReg_a)
+        return 1; // There is a data dependance
+  }
+
+  return 0;
+}
+
+/*
+ * Detect if the two instructions in the instruction buffer have data
+ * dependancies b/t themselves
+ */
+
+int inst_buffer_inter_dependant(){
+  if(!((  instruction_buffer[0].type == 1
+       || instruction_buffer[0].type == 2
+       || instruction_buffer[0].type == 5
+       || instruction_buffer[0].type == 6
+       || instruction_buffer[0].type == 7
+       || instruction_buffer[0].type == 8)
+       && (instruction_buffer[1].type == 3
+       ||  instruction_buffer[1].type == 4))){
+    return 1;
+  }
+
+  if(!((  instruction_buffer[1].type == 1
+       || instruction_buffer[1].type == 2
+       || instruction_buffer[1].type == 5
+       || instruction_buffer[1].type == 6
+       || instruction_buffer[1].type == 7
+       || instruction_buffer[1].type == 8)
+       && (instruction_buffer[0].type == 3
+       ||  instruction_buffer[0].type == 4))){
+    return 1;
+  }
+
+  if(instruction_buffer[0].type == 5){
+    return 1;
+  }
+
+  //instruction_buffer[0] is a ALU instruction
+  if (    instruction_buffer[0].type == 1
+       || instruction_buffer[0].type == 2
+       || instruction_buffer[0].type == 5
+       || instruction_buffer[0].type == 6
+       || instruction_buffer[0].type == 7
+       || instruction_buffer[0].type == 8){
+
+    if(instruction_buffer[1].type == 3){
+
+      //instruction_buffer[index] = R-Type instruction
+      if (instruction_buffer[0].type == 1){
+        if (   instruction_buffer[1].dReg == instruction_buffer[0].sReg_a
+            || instruction_buffer[1].dReg == instruction_buffer[0].sReg_b)
+            return 1; // There is a data dependance
+      }
+
+      //instruction_buffer[index] = I-Type Instruction
+      if (instruction_buffer[0].type == 2) {
+        if (instruction_buffer[1].dReg == instruction_buffer[0].sReg_a)
+            return 1; // There is a data dependance
+      }
+
+      //instruction_buffer[index] = Load Instruction
+      if (instruction_buffer[0].type == 3) {
+        if (instruction_buffer[1].dReg == instruction_buffer[0].sReg_a)
+            return 1; // There is a data dependance
+      }
+
+      //instruction_buffer[index] = Store Instruction
+      if (instruction_buffer[0].type == 4) {
+        if (instruction_buffer[1].dReg == instruction_buffer[0].sReg_a)
+            return 1; // There is a data dependance
+      }
+
+      //instruction_buffer[index] = Branch Instruction
+      if (instruction_buffer[0].type == 5) {
+        if (instruction_buffer[1].dReg == instruction_buffer[0].sReg_a)
+            return 1; // There is a data dependance
+      }
+
+      //instruction_buffer[index] = Branch Instruction
+      if (instruction_buffer[0].type == 8) {
+        if (instruction_buffer[1].dReg == instruction_buffer[0].sReg_a)
+            return 1; // There is a data dependance
+      }
+    }
+  }
+
+  //instruction_buffer[1] is a ALU instruction
+  else {
+
+      if(instruction_buffer[0].type == 3){
+
+      //instruction_buffer[index] = R-Type instruction
+      if (instruction_buffer[1].type == 1){
+        if (   instruction_buffer[0].dReg == instruction_buffer[1].sReg_a
+            || instruction_buffer[0].dReg == instruction_buffer[1].sReg_b)
+            return 1; // There is a data dependance
+      }
+
+      //instruction_buffer[index] = I-Type Instruction
+      if (instruction_buffer[1].type == 2) {
+        if (instruction_buffer[0].dReg == instruction_buffer[1].sReg_a)
+            return 1; // There is a data dependance
+      }
+
+      //instruction_buffer[index] = Load Instruction
+      if (instruction_buffer[1].type == 3) {
+        if (instruction_buffer[0].dReg == instruction_buffer[1].sReg_a)
+            return 1; // There is a data dependance
+      }
+
+      //instruction_buffer[index] = Store Instruction
+      if (instruction_buffer[1].type == 4) {
+        if (instruction_buffer[0].dReg == instruction_buffer[1].sReg_a)
+            return 1; // There is a data dependance
+      }
+
+      //instruction_buffer[index] = Branch Instruction
+      if (instruction_buffer[1].type == 5) {
+        if (instruction_buffer[0].dReg == instruction_buffer[1].sReg_a)
+            return 1; // There is a data dependance
+      }
+
+      //instruction_buffer[index] = Branch Instruction
+      if (instruction_buffer[1].type == 8) {
+        if (instruction_buffer[0].dReg == instruction_buffer[1].sReg_a)
+            return 1; // There is a data dependance
+      }
+    }
+  }
+
   return 0;
 }
 
