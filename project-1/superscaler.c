@@ -508,17 +508,26 @@ int main(int argc, char **argv) {
 
   trace_init();
 
-  //TODO the first and last instructions of the program are not displayed correctly
-  // it should have no-op's at the begining until the first 4 are executed and
-  // no-ops at the end while the last 5 are being executed
   while (1) {
-    if (read_next_inst == 1 && branch_ops == 0)
+    if (read_next_inst == 1 && branch_ops == 0){
       size = trace_get_item(&tr_entry);
       instruction_buffer[0] = *tr_entry;
-      if(!size){
+      if(size){
         size = trace_get_item(&tr_entry);
         instruction_buffer[1] = *tr_entry;
       }
+    }
+
+    if (cycle_number == 0){
+      if(instruction_buffer[0].type == 3 || instruction_buffer[0].type == 4){
+        buffer_ALU[0] = instruction_buffer[1];
+        buffer_LS[0] = instruction_buffer[0];
+      }
+      else{
+        buffer_ALU[0] = instruction_buffer[0];
+        buffer_LS[0] = instruction_buffer[1];
+      }
+    }
 
     if (!size) {  // no more instructions (trace_items) to simulate
       printf("\nSimulation terminates at cycle : %u\n", cycle_number);
@@ -579,6 +588,7 @@ int main(int argc, char **argv) {
             }
           }
         }
+        //issue one
         else if(!load_use_dependance(0)){
           if(instruction_buffer[0].type == 3 || instruction_buffer[0].type == 4){
             buffer_LS[0] = instruction_buffer[0];

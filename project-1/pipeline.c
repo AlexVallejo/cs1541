@@ -217,7 +217,6 @@ int insert_squashed(){
  *  @Return true if data hazard is detected and false otherwise
  */
 int data_hazard(){
-  //TODO ANYTHING follow a load is a data hazard. Are we taking this into account.
 
   // Compare the most recently read inst. to the inst. in the inst. fetch buffer
   // Stall if a i-type follows a load and it's source reg. is the same as
@@ -242,7 +241,6 @@ int data_hazard(){
 
   // Stall IF a load is followed by a branch inst. where the branch depends on
   // the value returned by the load inst.
-  // TODO insert 1 or two stalls? Mike's uses 1 as well.
   else if (tr_entry->type == 5 && buffer[0].type == 3){
     if (tr_entry->sReg_a == buffer[0].dReg)
       return 1;
@@ -338,9 +336,6 @@ int main(int argc, char **argv) {
 
   trace_init();
 
-  //TODO the first and last instructions of the program are not displayed correctly
-  // it should have no-op's at the begining until the first 4 are executed and
-  // no-ops at the end while the last 5 are being executed
   while (1) {
     if (read_next_inst == 1 && branch_ops == 0)
       size = trace_get_item(&tr_entry);
