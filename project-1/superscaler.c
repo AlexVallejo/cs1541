@@ -95,60 +95,60 @@ int print_buffers_LS(){
   printf("\n---------------------CYCLE #%d-------------------\n",cycle_number);
 
   for (int i = 0; i < NUM_BUFFERS; i++){
-    tr_entry = &buffer[i];
+    tr_entry = &buffer_LS[i];
 
     switch (i) {
       case 0:
-        printf("%-6s => ", "IF/ID");
+        printf("%-12s => ", "LS: IF/ID");
         break;
       case 1:
-        printf("%-6s => ", "ID/EX");
+        printf("%-12s => ", "LS: ID/EX");
         break;
       case 2:
-        printf("%-6s => ","EX/MEM");
+        printf("%-12s => ","LS: EX/MEM");
         break;
       case 3:
-        printf("%-6s => ","MEM/WB");
+        printf("%-12s => ","LS: MEM/WB");
         break;
     }
 
-    switch (tr_entry_LS->type) {
+    switch (tr_entry->type) {
       case ti_NOP:
-        if(tr_entry_LS->Addr == 1)
+        if(tr_entry->Addr == 1)
           printf("SQUASHED\n");
         else
           printf("NOP\n");
         break;
       case ti_RTYPE:
         printf("RTYPE: ") ;
-        printf("(PC: %x)(sReg_a: %d)(sReg_b: %d)(dReg: %d)\n", tr_entry_LS->PC, tr_entry_LS->sReg_a, tr_entry_LS->sReg_b, tr_entry_LS->dReg);
+        printf("(PC: %x)(sReg_a: %d)(sReg_b: %d)(dReg: %d)\n", tr_entry->PC, tr_entry->sReg_a, tr_entry->sReg_b, tr_entry->dReg);
         break;
       case ti_ITYPE:
         printf("ITYPE:") ;
-        printf(" (PC: %x)(sReg_a: %d)(dReg: %d)(addr: %x)\n", tr_entry_LS->PC, tr_entry_LS->sReg_a, tr_entry_LS->dReg, tr_entry_LS->Addr);
+        printf(" (PC: %x)(sReg_a: %d)(dReg: %d)(addr: %x)\n", tr_entry->PC, tr_entry->sReg_a, tr_entry->dReg, tr_entry->Addr);
         break;
       case ti_LOAD:
         printf("LOAD:") ;
-        printf(" (PC: %x)(sReg_a: %d)(dReg: %d)(addr: %x)\n", tr_entry_LS->PC, tr_entry_LS->sReg_a, tr_entry_LS->dReg, tr_entry_LS->Addr);
+        printf(" (PC: %x)(sReg_a: %d)(dReg: %d)(addr: %x)\n", tr_entry->PC, tr_entry->sReg_a, tr_entry->dReg, tr_entry->Addr);
         break;
       case ti_STORE:
         printf("STORE:") ;
-        printf(" (PC: %x)(sReg_a: %d)(sReg_b: %d)(addr: %x)\n", tr_entry_LS->PC, tr_entry_LS->sReg_a, tr_entry_LS->sReg_b, tr_entry_LS->Addr);
+        printf(" (PC: %x)(sReg_a: %d)(sReg_b: %d)(addr: %x)\n", tr_entry->PC, tr_entry->sReg_a, tr_entry->sReg_b, tr_entry->Addr);
         break;
       case ti_BRANCH:
         printf("BRANCH:") ;
-        printf(" (PC: %x)(sReg_a: %d)(sReg_b: %d)(addr: %x)\n", tr_entry_LS->PC, tr_entry_LS->sReg_a, tr_entry_LS->sReg_b, tr_entry_LS->Addr);
+        printf(" (PC: %x)(sReg_a: %d)(sReg_b: %d)(addr: %x)\n", tr_entry->PC, tr_entry->sReg_a, tr_entry->sReg_b, tr_entry->Addr);
         break;
       case ti_JTYPE:
         printf("JTYPE:") ;
-        printf(" (PC: %x)(addr: %x)\n", tr_entry_LS->PC,tr_entry_LS->Addr);
+        printf(" (PC: %x)(addr: %x)\n", tr_entry->PC,tr_entry->Addr);
         break;
       case ti_SPECIAL:
         printf("SPECIAL\n") ;
         break;
       case ti_JRTYPE:
         printf("JRTYPE:") ;
-        printf(" (PC: %x) (sReg_a: %d)(addr: %x)\n", tr_entry_LS->PC, tr_entry_LS->dReg, tr_entry_LS->Addr);
+        printf(" (PC: %x) (sReg_a: %d)(addr: %x)\n", tr_entry->PC, tr_entry->dReg, tr_entry->Addr);
         break;
       } // END switch
     }// END for (int i = 0; i < NUM_BUFFERS; i++)
@@ -160,60 +160,60 @@ int print_buffers_ALU(){
   printf("\n---------------------CYCLE #%d-------------------\n",cycle_number);
 
   for (int i = 0; i < NUM_BUFFERS; i++){
-    tr_entry_ALU = &buffer[i];
+    tr_entry = &buffer_ALU[i];
 
     switch (i) {
       case 0:
-        printf("%-6s => ", "IF/ID");
+        printf("%-12s => ", "ALU: IF/ID");
         break;
       case 1:
-        printf("%-6s => ", "ID/EX");
+        printf("%-12s => ", "ALU: ID/EX");
         break;
       case 2:
-        printf("%-6s => ","EX/MEM");
+        printf("%-12s => ","ALU: EX/MEM");
         break;
       case 3:
-        printf("%-6s => ","MEM/WB");
+        printf("%-12s => ","ALU: MEM/WB");
         break;
     }
 
-    switch (tr_entry_ALU->type) {
+    switch (tr_entry->type) {
       case ti_NOP:
-        if(tr_entry_ALU->Addr == 1)
+        if(tr_entry->Addr == 1)
           printf("SQUASHED\n");
         else
           printf("NOP\n");
         break;
       case ti_RTYPE:
         printf("RTYPE: ") ;
-        printf("(PC: %x)(sReg_a: %d)(sReg_b: %d)(dReg: %d)\n", tr_entry_ALU->PC, tr_entry_ALU->sReg_a, tr_entry_ALU->sReg_b, tr_entry_ALU->dReg);
+        printf("(PC: %x)(sReg_a: %d)(sReg_b: %d)(dReg: %d)\n", tr_entry->PC, tr_entry->sReg_a, tr_entry->sReg_b, tr_entry->dReg);
         break;
       case ti_ITYPE:
         printf("ITYPE:") ;
-        printf(" (PC: %x)(sReg_a: %d)(dReg: %d)(addr: %x)\n", tr_entry_ALU->PC, tr_entry_ALU->sReg_a, tr_entry_ALU->dReg, tr_entry_ALU->Addr);
+        printf(" (PC: %x)(sReg_a: %d)(dReg: %d)(addr: %x)\n", tr_entry->PC, tr_entry->sReg_a, tr_entry->dReg, tr_entry->Addr);
         break;
       case ti_LOAD:
         printf("LOAD:") ;
-        printf(" (PC: %x)(sReg_a: %d)(dReg: %d)(addr: %x)\n", tr_entry_ALU->PC, tr_entry_ALU->sReg_a, tr_entry_ALU->dReg, tr_entry_ALU->Addr);
+        printf(" (PC: %x)(sReg_a: %d)(dReg: %d)(addr: %x)\n", tr_entry->PC, tr_entry->sReg_a, tr_entry->dReg, tr_entry->Addr);
         break;
       case ti_STORE:
         printf("STORE:") ;
-        printf(" (PC: %x)(sReg_a: %d)(sReg_b: %d)(addr: %x)\n", tr_entry_ALU->PC, tr_entry_ALU->sReg_a, tr_entry_ALU->sReg_b, tr_entry_ALU->Addr);
+        printf(" (PC: %x)(sReg_a: %d)(sReg_b: %d)(addr: %x)\n", tr_entry->PC, tr_entry->sReg_a, tr_entry->sReg_b, tr_entry->Addr);
         break;
       case ti_BRANCH:
         printf("BRANCH:") ;
-        printf(" (PC: %x)(sReg_a: %d)(sReg_b: %d)(addr: %x)\n", tr_entry_ALU->PC, tr_entry_ALU->sReg_a, tr_entry_ALU->sReg_b, tr_entry_ALU->Addr);
+        printf(" (PC: %x)(sReg_a: %d)(sReg_b: %d)(addr: %x)\n", tr_entry->PC, tr_entry->sReg_a, tr_entry->sReg_b, tr_entry->Addr);
         break;
       case ti_JTYPE:
         printf("JTYPE:") ;
-        printf(" (PC: %x)(addr: %x)\n", tr_entry_ALU->PC,tr_entry_ALU->Addr);
+        printf(" (PC: %x)(addr: %x)\n", tr_entry->PC,tr_entry->Addr);
         break;
       case ti_SPECIAL:
         printf("SPECIAL\n") ;
         break;
       case ti_JRTYPE:
         printf("JRTYPE:") ;
-        printf(" (PC: %x) (sReg_a: %d)(addr: %x)\n", tr_entry_ALU->PC, tr_entry_ALU->dReg, tr_entry_ALU->Addr);
+        printf(" (PC: %x) (sReg_a: %d)(addr: %x)\n", tr_entry->PC, tr_entry->dReg, tr_entry->Addr);
         break;
       } // END switch
     }// END for (int i = 0; i < NUM_BUFFERS; i++)
