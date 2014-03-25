@@ -70,18 +70,28 @@ int main(int argc, char **argv){
     exit(0);
   }
 
-  trace_file_name = argv[1];
-  trace_view_on   = *argv[2] - 48; // Subtract 48 to get an int value from char
-  cache_size      = atoi(argv[3]);
-  block_size      = atoi(argv[4]);
-  cache_sets      = atoi(argv[5]);
-  replacement_policy = *argv[6] - 48; // Subtract 48 to get an int value from char
+  trace_file_name    = argv[1];
+  trace_view_on      = atoi(argv[2]);
+  cache_size         = atoi(argv[3]);
+  block_size         = atoi(argv[4]);
+  cache_sets         = atoi(argv[5]);
+  replacement_policy = atoi(argv[6]);
 
   if (   !is_power_of_two(cache_size)
       || !is_power_of_two(block_size)
       || !is_power_of_two(cache_sets)
      ){
     fprintf(stdout, "Cache size, block size and associativity must be powers of 2");
+    exit(1);
+  }
+
+  if (trace_view_on != 0 && trace_view_on != 1){
+    fprintf(stdout, "Trace view must be on (1) or off (0)");
+    exit(1);
+  }
+
+  if (replacement_policy != 0 && replacement_policy != 1){
+    fprintf(stdout, "Replacement policy must be LRU (0) or FIFO (1)");
     exit(1);
   }
 
