@@ -55,22 +55,29 @@ int trace_get_item(struct trace_item **item)
   return 1;
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv){
   struct trace_item *tr_entry;
   size_t size;
   char *trace_file_name;
-  int trace_view_on ;
+  char trace_view_on, cache_size, block_size, cache_sets, replacement_policy;
 
-  if (argc == 1) {
-    fprintf(stdout, "\nUSAGE: tv <trace_file> <switch - any character>\n");
-    fprintf(stdout, "\n(switch) to turn on or off individual item view.\n\n");
+  if (argc != 7) {
+    fprintf(stdout, "\nUSAGE: cache <trace_file> <trace_view_on> <cache size (power of 2)> <block size (power of 2)> <cache associtivity (power of 2)> <replacement policy 0 => LRU 1 => FIFO\n");
     exit(0);
   }
 
   trace_file_name = argv[1];
-  trace_view_on = (argc == 3);
-  // here you should extract the cache parameters from the command line
+  trace_view_on   = *argv[2] - 48; // Subtract 48 to get an int value from char
+  cache_size      = *argv[3];
+  block_size      = *argv[4];
+  cache_sets      = *argv[5];
+  replacement_policy = *argv[6] - 48; // Subtract 48 to get an int value from char
+
+  fprintf(stdout, "trace_view_on => %d\n", trace_view_on);
+  fprintf(stdout, "cache_size => %d\n", cache_size);
+  fprintf(stdout, "block_size => %d\n", block_size);
+  fprintf(stdout, "cache_sets => %d\n", cache_sets);
+  fprintf(stdout, "replacement_policy => %d\n", replacement_policy);
 
   fprintf(stdout, "\n ** opening file %s\n", trace_file_name);
 
