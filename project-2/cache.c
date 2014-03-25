@@ -24,8 +24,7 @@ char is_power_of_two(int x){
   return x && (!(x&(x-1)));
 }
 
-void trace_init()
-{
+void trace_init(){
   trace_buf = malloc(sizeof(struct trace_item) * TRACE_BUFSIZE);
 
   if (!trace_buf) {
@@ -37,14 +36,12 @@ void trace_init()
   trace_buf_end = 0;
 }
 
-void trace_uninit()
-{
+void trace_uninit(){
   free(trace_buf);
   fclose(trace_fd);
 }
 
-int trace_get_item(struct trace_item **item)
-{
+int trace_get_item(struct trace_item **item){
   int n_items;
 
   if (trace_buf_ptr == trace_buf_end) {
