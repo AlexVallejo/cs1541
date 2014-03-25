@@ -79,7 +79,7 @@ int main(int argc, char **argv){
 
   if (   !is_power_of_two(cache_size)
       || !is_power_of_two(block_size)
-      || !is_power_of_two(cache_size)
+      || !is_power_of_two(cache_sets)
      ){
     fprintf(stdout, "Cache size, block size and associativity must be powers of 2");
     exit(1);
@@ -107,9 +107,10 @@ int main(int argc, char **argv){
       break;
     }
 
-    else{              /* process only loads and stores */;
+    // process only loads and stores
+    else{
       if (tr_entry->type == ti_LOAD) {
-        if (trace_view_on) printf("LOAD %x \n",tr_entry->Addr) ;
+        if (trace_view_on) printf("LOAD %x \n",tr_entry->Addr);
         accesses ++;
         read_accesses++ ;
         // call cache_access(struct cache_t *cp, tr_entry->Addr, access_type)
