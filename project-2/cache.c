@@ -17,6 +17,13 @@ unsigned int hits = 0;
 unsigned int misses = 0;
 unsigned int misses_with_writeback = 0;
 
+// Check if x is power of 2
+char is_power_of_two(int x){
+  // A number n is a power of two if the bitwise AND of n and n - 1 equals 0
+  // First x in the below expression is for the case when x is 0
+  return x && (!(x&(x-1)));
+}
+
 void trace_init()
 {
   trace_buf = malloc(sizeof(struct trace_item) * TRACE_BUFSIZE);
@@ -72,6 +79,14 @@ int main(int argc, char **argv){
   block_size      = atoi(argv[4]);
   cache_sets      = atoi(argv[5]);
   replacement_policy = *argv[6] - 48; // Subtract 48 to get an int value from char
+
+  if (   !is_power_of_two(cache_size)
+      || !is_power_of_two(block_size)
+      || !is_power_of_two(cache_size)
+     ){
+    fprintf(stdout, "Cache size, block size and associativity must be powers of 2");
+    exit(1);
+  }
 
   fprintf(stdout, "\n ** opening file %s **\n", trace_file_name);
 
