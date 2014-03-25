@@ -68,18 +68,12 @@ int main(int argc, char **argv){
 
   trace_file_name = argv[1];
   trace_view_on   = *argv[2] - 48; // Subtract 48 to get an int value from char
-  cache_size      = *argv[3];
-  block_size      = *argv[4];
-  cache_sets      = *argv[5];
+  cache_size      = atoi(argv[3]);
+  block_size      = atoi(argv[4]);
+  cache_sets      = atoi(argv[5]);
   replacement_policy = *argv[6] - 48; // Subtract 48 to get an int value from char
 
-  fprintf(stdout, "trace_view_on => %d\n", trace_view_on);
-  fprintf(stdout, "cache_size => %d\n", cache_size);
-  fprintf(stdout, "block_size => %d\n", block_size);
-  fprintf(stdout, "cache_sets => %d\n", cache_sets);
-  fprintf(stdout, "replacement_policy => %d\n", replacement_policy);
-
-  fprintf(stdout, "\n ** opening file %s\n", trace_file_name);
+  fprintf(stdout, "\n ** opening file %s **\n", trace_file_name);
 
   trace_fd = fopen(trace_file_name, "rb");
 
