@@ -41,8 +41,8 @@ cache_create(int size, int blocksize, int assoc, enum cache_policy policy){
   // The second dimension is "assoc", which is the number of blocks in each set.
 
   int i;
-  int nblocks = 1; // number of blocks in the cache
-  int nsets = 1;   // number of sets (entries) in the cache
+  int nblocks = assoc; // number of blocks in the cache
+  int nsets = size / (blocksize * assoc);   // number of sets (entries) in the cache
 
   //
   // YOUR JOB: calculate the number of sets and blocks in the cache
