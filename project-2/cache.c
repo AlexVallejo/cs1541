@@ -108,8 +108,9 @@ int main(int argc, char **argv){
   trace_init();
   cache_create(cache_size, block_size, cache_sets, replacement_policy);
 
-  while(1){
+  while (1){
     size = trace_get_item(&tr_entry);
+    int result = -1;
 
     if (!size) {       /* no more instructions to simulate */
       printf("+ number of accesses : %d \n", accesses);
@@ -120,23 +121,39 @@ int main(int argc, char **argv){
 
     // process only loads and stores
     else{
-      if (tr_entry->type == ti_LOAD) {
+      if (tr_entry->type == ti_LOAD){
         if (trace_view_on)
           printf("LOAD %x \n",tr_entry->Addr);
         accesses++;
         read_accesses++;
-        cache_access(struct cache_t *cp, tr_entry->Addr, access_type)
+        result = cache_access(struct cache_t *cp, tr_entry->Addr, access_type)
       }
 
-      if (tr_entry->type == ti_STORE) {
+      if (tr_entry->type == ti_STORE){
         if (trace_view_on)
           printf("STORE %x \n",tr_entry->Addr);
-        accesses ++;
+        accesses++;
         write_accesses++;
-        // call cache_access(struct cache_t *cp, tr_entry->Addr, access_type)
+        result = cache_access(struct cache_t *cp, tr_entry->Addr, access_type)
       }
       // based on the value returned, update the statisctics for hits, misses
       // and misses_with_writeback
+
+      switch (result){
+        case 0:
+          hits++;
+          break;
+        case 1:
+          misses++;
+          break;
+        case 2:
+          misses_with_writeback++;
+          break;
+        default:
+          fprintf(stdout, "\n%s%s\n" , "** Return of cache_access invalid. ",
+                          "Data integrity compromised. **\n");
+          exit(1);
+      }
     }
   }
 
