@@ -40,14 +40,12 @@ struct cache_t * cache_create(int size, int blocksize, int assoc, enum cache_pol
   // The second dimension is "assoc", which is the number of blocks in each set.
 
   int i;
-  int nblocks = assoc;                      // number of blocks in the cache
-  int nsets = size / (blocksize * assoc);   // number of sets (entries) in the cache
+  int nblocks; // number of blocks in the cache
+  int nsets;   // number of sets (entries) in the cache
 
-  //
   // YOUR JOB: calculate the number of sets and blocks in the cache
-  //
-  // nblocks = X;
-  // nsets = Y;
+  nblocks = assoc;
+  nsets = size / (blocksize * assoc);
 
   struct cache_t *C = (struct cache_t *)calloc(1, sizeof(struct cache_t));
 
