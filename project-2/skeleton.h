@@ -11,13 +11,13 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 
 struct cache_blk_t {
   unsigned long tag;
   char valid;
   char dirty;
-  /* Add either a pointer (to construct FIFO or LRU lists)
-   or a time stamp to implement the replacement polity */
+  int time;
 };
 
 enum cache_policy {
@@ -34,8 +34,7 @@ struct cache_t {
   struct cache_blk_t **blocks;    // cache blocks in the cache
 };
 
-struct cache_t *
-cache_create(int size, int blocksize, int assoc, enum cache_policy policy){
+struct cache_t * cache_create(int size, int blocksize, int assoc, enum cache_policy policy){
   // The cache is represented by a 2-D array of blocks.
   // The first dimension of the 2D array is "nsets" which is the number of sets (entries)
   // The second dimension is "assoc", which is the number of blocks in each set.
@@ -66,8 +65,7 @@ cache_create(int size, int blocksize, int assoc, enum cache_policy policy){
   return C;
 }
 
-int
-cache_access(struct cache_t *cp, unsigned long address,
+int cache_access(struct cache_t *cp, unsigned long address,
              char access_type, unsigned long long now) {
   //////////////////////////////////////////////////////////////////////
   //
