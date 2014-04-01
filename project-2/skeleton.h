@@ -46,7 +46,7 @@ struct cache_t * cache_create(int size, int blocksize, int assoc, enum cache_pol
   // YOUR JOB: calculate the number of sets and blocks in the cache
   nblocks = assoc;
   nsets = size / (blocksize * assoc);
-
+t
   struct cache_t *C = (struct cache_t *)calloc(1, sizeof(struct cache_t));
 
   C->nsets = nsets;
@@ -63,18 +63,24 @@ struct cache_t * cache_create(int size, int blocksize, int assoc, enum cache_pol
   return C;
 }
 
+long calc_index(long address){
+  //HOW DO WE CALCULATE THIS AND GET BLOCK SIZE FOR THE STRUCT
+  return address / blocksize;
+}
+
+long calc_tag(long address){
+  //HOW DO WE CALCULATE THIS AND GET BLOCK SIZE FOR THE STRUCT
+  return address % blocksize;
+}
+
+// return 0 if a hit, 1 if a miss or 2 if a miss_with_write_back
 int cache_access(struct cache_t *cp, unsigned long address,
              char access_type, unsigned long long now) {
-  //////////////////////////////////////////////////////////////////////
-  //
-  // Your job:
-  // based on address determine the set to access in cp
-  // examine blocks in the set to check hit/miss
-  // if miss, determine the victim in the set to replace
-  // if update the block list based on the replacement policy
-  // return 0 if a hit, 1 if a miss or 2 if a miss_with_write_back
-  //
-  //////////////////////////////////////////////////////////////////////
+  long requested_index;
+  long requested_tag;
+
+  requested_index = calc_index(address);
+  requested_tag = calc_tag(address);
 }
 
 #endif
