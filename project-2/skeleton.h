@@ -42,9 +42,9 @@ struct cache_t * cache_create(int size, int blocksize, int assoc, enum cache_pol
   int nblocks; // number of blocks in the cache
   int nsets;   // number of sets (entries) in the cache
 
-  // YOUR JOB: calculate the number of sets and blocks in the cache
-  nblocks = assoc;
-  nsets = size / (blocksize * assoc);
+  //TODO verify that this is correct
+  nsets = assoc;
+  nblocks = size / (blocksize * assoc);
 
   struct cache_t *C = (struct cache_t *)calloc(1, sizeof(struct cache_t));
 
