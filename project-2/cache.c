@@ -107,9 +107,10 @@ int main(int argc, char **argv){
   }
 
   trace_init();
-  cache_create(cache_size, block_size, cache_sets, replacement_policy);
+  struct cache_t *cp = cache_create(cache_size, block_size, cache_sets, replacement_policy);
 
   while (1){
+    unsigned long long int cycle_count = 0;
     size = trace_get_item(&tr_entry);
     int result = -1;
 
@@ -127,7 +128,7 @@ int main(int argc, char **argv){
           printf("LOAD %x \n",tr_entry->Addr);
         accesses++;
         read_accesses++;
-        result = cache_access(struct cache_t *cp, tr_entry->Addr, access_type)
+        result = cache_access(cp, tr_entry->Addr, access_type, cycle_count)
       }
 
       if (tr_entry->type == ti_STORE){
@@ -135,7 +136,7 @@ int main(int argc, char **argv){
           printf("STORE %x \n",tr_entry->Addr);
         accesses++;
         write_accesses++;
-        result = cache_access(struct cache_t *cp, tr_entry->Addr, access_type)
+        result = cache_access(cp, tr_entry->Addr, access_type, cycle_count)
       }
       // based on the value returned, update the statisctics for hits, misses
       // and misses_with_writeback
@@ -156,6 +157,7 @@ int main(int argc, char **argv){
           exit(1);
       }
     }
+    cycle_count++;
   }
 
   trace_uninit();
