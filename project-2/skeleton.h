@@ -11,7 +11,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <time.h>
 
 struct cache_blk_t {
   unsigned long tag;
@@ -46,7 +45,7 @@ struct cache_t * cache_create(int size, int blocksize, int assoc, enum cache_pol
   // YOUR JOB: calculate the number of sets and blocks in the cache
   nblocks = assoc;
   nsets = size / (blocksize * assoc);
-t
+
   struct cache_t *C = (struct cache_t *)calloc(1, sizeof(struct cache_t));
 
   C->nsets = nsets;
@@ -81,7 +80,15 @@ int cache_access(struct cache_t *cp, unsigned long address,
 
   requested_index = calc_index(address);
   requested_tag = calc_tag(address);
+
+  //Check index for tag
+  if(//Hit){
+    return 0;
+  }
+  if(//Miss w/ writeback){
+  }
+  if(//miss){
+  }
 }
 
 #endif
-
