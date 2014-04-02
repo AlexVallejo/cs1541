@@ -91,6 +91,7 @@ int main(int argc, char **argv){
     exit(1);
   }
 
+  //TODO fix this. It's not wrong to pass the "LRU" or "FIFO" cause its an enum
   if (replacement_policy != 0 && replacement_policy != 1){
     fprintf(stdout, "Replacement policy must be LRU (0) or FIFO (1)");
     exit(1);
