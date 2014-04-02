@@ -128,7 +128,7 @@ int main(int argc, char **argv){
           printf("LOAD %x \n",tr_entry->Addr);
         accesses++;
         read_accesses++;
-        result = cache_access(cp, tr_entry->Addr, access_type, cycle_count)
+        result = cache_access(cp, tr_entry->Addr, 0 , cycle_count);
       }
 
       if (tr_entry->type == ti_STORE){
@@ -136,7 +136,7 @@ int main(int argc, char **argv){
           printf("STORE %x \n",tr_entry->Addr);
         accesses++;
         write_accesses++;
-        result = cache_access(cp, tr_entry->Addr, access_type, cycle_count)
+        result = cache_access(cp, tr_entry->Addr, 1, cycle_count);
       }
       // based on the value returned, update the statisctics for hits, misses
       // and misses_with_writeback
