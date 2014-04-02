@@ -62,11 +62,11 @@ struct cache_t * cache_create(int size, int blocksize, int assoc, enum cache_pol
   return C;
 }
 
-long calc_index(long address, int nsets){
+long calc_index(long address, int nsets, int blocksize){
   return (address / blocksize) % nsets;
 }
 
-unsigned long calc_tag(unsigned long address, int nsets){
+unsigned long calc_tag(unsigned long address, int nsets, int blocksize){
   return (address / blocksize) / nsets;
 }
 
@@ -173,8 +173,8 @@ int cache_access(struct cache_t *cp, unsigned long address,
   unsigned long requested_tag;
   struct cache_blk_t temp;
 
-  requested_index = calc_index(address, cp->nsets);
-  requested_tag = calc_tag(address, cp->nsets);
+  requested_index = calc_index(address, cp->nsets, cp->bsize);
+  requested_tag = calc_tag(address, cp->nsets, cp->bsize);
   hit = 0;
 
   if(detect_hit(cp, requested_tag, requested_index, access_type, now) == 1){
