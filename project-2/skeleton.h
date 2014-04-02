@@ -53,7 +53,7 @@ struct cache_t * cache_create(int size, int blocksize, int assoc, enum cache_pol
   C->assoc = assoc;
   C->policy = policy;
 
-  C->blocks= (struct cache_blk_t **)calloc(nsets, sizeof(struct cache_blk_t));
+  C->blocks = (struct cache_blk_t **)calloc(nsets, sizeof(struct cache_blk_t));
 
   for(i = 0; i < nsets; i++) {
     C->blocks[i] = (struct cache_blk_t *)calloc(assoc, sizeof(struct cache_blk_t));
@@ -62,24 +62,23 @@ struct cache_t * cache_create(int size, int blocksize, int assoc, enum cache_pol
   return C;
 }
 
-//TODO fix these calculations to be correct
 long calc_index(long address, int blocksize){
   return address / blocksize;
 }
 
-//TODO fix these calculations to be correct
 unsigned long calc_tag(unsigned long address, int blocksize){
   return address % blocksize;
 }
 
 int detect_hit(struct cache_t *cp, unsigned long req_tag, long req_index,
-               char access, unsigned long long cycle){
+               char access_type, unsigned long long now){
   int i;
-  struct cache_blk_t temp;
-  //TODO update access time of hits
   for(i = 0; i < cp->assoc; i++){
     if(cp->blocks[i][req_index]->tag == req_tag){
-      cp->blocks[i][req_index]->
+      cp->blocks[i][req_index]->time = now;
+      if(access_type = 1){
+        cp->blocks[i][req_index]->dirty = 1;
+      }
       return 1;
     }
   }
