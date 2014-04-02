@@ -16,7 +16,8 @@ struct cache_blk_t {
   unsigned long tag;
   char valid;
   char dirty;
-  unsigned long long time;
+  unsigned long long last_time;
+  unsigned long long first_time;
 };
 
 enum cache_policy {
