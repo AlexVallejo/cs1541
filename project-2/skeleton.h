@@ -90,12 +90,17 @@ int calc_LRU(struct cache_t *cp, long req_index){
   int LRU;
   unsigned long long temp_time;
   int i;
+  printf("\nSTART LRU\n");
+
+  //FAILS TO PRINT HERE
+  printf("\n last_time = %llu", cp->blocks[req_index][i].last_time);
 
   temp_time = cp->blocks[req_index][i].last_time;
   LRU = 0;
 
   for(i = 0; i < cp->assoc; i++){
     if(cp->blocks[req_index][i].last_time < temp_time){
+      //printf("\n i = %d last_time = %llu temp_time = %llu\n", i, cp->blocks[req_index][i].last_time, temp_time);
       temp_time = cp->blocks[req_index][i].last_time;
       LRU = i;
     }
@@ -125,7 +130,6 @@ int detect_miss(struct cache_t *cp, unsigned long req_tag, long req_index,
   int i;
   int replacement_index;
   int return_value;
-
   for(i = 0; i < cp->assoc; i++){
     if(cp->blocks[req_index][i].valid == 0){
       cp->blocks[req_index][i].tag = req_tag;
@@ -137,6 +141,7 @@ int detect_miss(struct cache_t *cp, unsigned long req_tag, long req_index,
     }
   }
 
+  printf("\nCALL LRU or FIFO\n");
   if(cp->policy == 0)
     replacement_index = calc_LRU(cp, req_index);
   else
@@ -151,7 +156,7 @@ int detect_miss(struct cache_t *cp, unsigned long req_tag, long req_index,
       cp->blocks[req_index][replacement_index].dirty = 1;
       return 1;
     }
-    if(cp->blocks[req_index][replacement_index].dirty == 1){
+    else if(cp->blocks[req_index][replacement_index].dirty == 1){
       cp->blocks[req_index][replacement_index].tag = req_tag;
       cp->blocks[req_index][replacement_index].last_time = now;
       cp->blocks[req_index][replacement_index].first_time = now;
@@ -166,20 +171,20 @@ int detect_miss(struct cache_t *cp, unsigned long req_tag, long req_index,
 // return 0 if a hit, 1 if a miss or 2 if a miss_with_write_back
 int cache_access(struct cache_t *cp, unsigned long address,
                  char access_type, unsigned long long now){
-  int hit;
   int i;
   int detected_miss;
   long requested_index;
   unsigned long requested_tag;
   struct cache_blk_t temp;
 
+
   requested_index = calc_index(address, cp->nsets, cp->bsize);
   requested_tag = calc_tag(address, cp->nsets, cp->bsize);
-  hit = 0;
 
   if(detect_hit(cp, requested_tag, requested_index, access_type, now) == 1){
     return 0;
   }
+  printf("\nCALL Detect Miss\n");
 
   detected_miss = detect_miss(cp, requested_tag, requested_index, access_type, now);
 
