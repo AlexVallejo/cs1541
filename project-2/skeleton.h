@@ -74,11 +74,11 @@ int detect_hit(struct cache_t *cp, unsigned long req_tag, long req_index,
                char access_type, unsigned long long now){
   int i;
   for(i = 0; i < cp->assoc; i++){
-    if(cp->blocks[req_index][i]->tag == req_tag && cp->blocks[req_index][i]->valid == 1){
-      if(cp->cache_policy = 0)
-        cp->blocks[req_index][i]->last_time = now;
-      if(access_type = 1){
-        cp->block[req_index][i]->dirty = 1;
+    if(cp->blocks[req_index][i].tag == req_tag && cp->blocks[req_index][i].valid == 1){
+      if(cp->policy == 0)
+        cp->blocks[req_index][i].last_time = now;
+      if(access_type == 1){
+        cp->blocks[req_index][i].dirty = 1;
       }
       return 1;
     }
@@ -91,12 +91,12 @@ int calc_LRU(struct cache_t *cp, long req_index){
   unsigned long long temp_time;
   int i;
 
-  temp_time = cp->block[req_index][i]->last_time;
+  temp_time = cp->blocks[req_index][i].last_time;
   LRU = 0;
 
   for(i = 0; i < cp->assoc; i++){
-    if(cp->block[req_index][i]->last_time < temp_time){
-      temp_time = cp->block[req_index][i]->last_time;
+    if(cp->blocks[req_index][i].last_time < temp_time){
+      temp_time = cp->blocks[req_index][i].last_time;
       LRU = i;
     }
   }
@@ -108,16 +108,17 @@ int calc_FIFO(struct cache_t *cp, long req_index){
   unsigned long long temp_time;
   int i;
 
-  temp_time = cp->block[req_index][i]->first_time;
+  temp_time = cp->blocks[req_index][i].first_time;
   FIFO = 0;
 
   for(i = 0; i < cp->assoc; i++){
-    if(cp->block[req_index][i]->first_time < temp_time){
-      temp_time = cp->block[req_index][i]->first_time;
+    if(cp->blocks[req_index][i].first_time < temp_time){
+      temp_time = cp->blocks[req_index][i].first_time;
       FIFO = i;
     }
   }
   return FIFO;
+}
 
 int detect_miss(struct cache_t *cp, unsigned long req_tag, long req_index,
                 char access_type, unsigned long long now){
@@ -126,36 +127,36 @@ int detect_miss(struct cache_t *cp, unsigned long req_tag, long req_index,
   int return_value;
 
   for(i = 0; i < cp->assoc; i++){
-    if(cp->blocks[req_index][i]->valid == 0){
-      cp->block[req_index][i]->tag = req_tag;
-      cp->block[req_index][i]->last_time = now;
-      cp->block[req_index][i]->first_time = now;
-      cp->block[req_index][i]->valid = 1;
-      cp->block[req_index][i]->dirty = 1;
+    if(cp->blocks[req_index][i].valid == 0){
+      cp->blocks[req_index][i].tag = req_tag;
+      cp->blocks[req_index][i].last_time = now;
+      cp->blocks[req_index][i].first_time = now;
+      cp->blocks[req_index][i].valid = 1;
+      cp->blocks[req_index][i].dirty = 1;
       return 1;
     }
   }
 
-  if(cp->cache_policy = 0)
+  if(cp->policy == 0)
     replacement_index = calc_LRU(cp, req_index);
   else
     replacement_index = calc_FIFO(cp, req_index);
 
-  if( cp->block[req_index][replacement_index]->valid = 1){
-    if(cp->block[req_index][replacement_index]->dirty = 0){
-      cp->block[req_index][replacement_index]->tag = req_tag;
-      cp->block[req_index][replacement_index]->last_time = now;
-      cp->block[req_index][replacement_index]->first_time = now;
-      cp->block[req_index][replacement_index]->valid = 1;
-      cp->block[req_index][replacement_index]->dirty = 1;
+  if( cp->blocks[req_index][replacement_index].valid == 1){
+    if(cp->blocks[req_index][replacement_index].dirty == 0){
+      cp->blocks[req_index][replacement_index].tag = req_tag;
+      cp->blocks[req_index][replacement_index].last_time = now;
+      cp->blocks[req_index][replacement_index].first_time = now;
+      cp->blocks[req_index][replacement_index].valid = 1;
+      cp->blocks[req_index][replacement_index].dirty = 1;
       return 1;
     }
-    if(cp->block[req_index][replacement_index]->dirty = 1){
-      cp->block[req_index][replacement_index]->tag = req_tag;
-      cp->block[req_index][replacement_index]->last_time = now;
-      cp->block[req_index][replacement_index]->first_time = now;
-      cp->block[req_index][replacement_index]->valid = 1;
-      cp->block[req_index][replacement_index]->dirty = 1;
+    if(cp->blocks[req_index][replacement_index].dirty == 1){
+      cp->blocks[req_index][replacement_index].tag = req_tag;
+      cp->blocks[req_index][replacement_index].last_time = now;
+      cp->blocks[req_index][replacement_index].first_time = now;
+      cp->blocks[req_index][replacement_index].valid = 1;
+      cp->blocks[req_index][replacement_index].dirty = 1;
       return 2;
     }
   }
@@ -180,10 +181,10 @@ int cache_access(struct cache_t *cp, unsigned long address,
     return 0;
   }
 
-  detected_miss = detect_miss();
+  detected_miss = detect_miss(cp, requested_tag, requested_index, access_type, now);
 
   if(detected_miss != 0){
-    return detected_miss
+    return detected_miss;
   }
 
   fprintf(stderr, "\nCRITICAL ERROR - NOT A HIT NOT A MISS NOT ANYTHING\n");
