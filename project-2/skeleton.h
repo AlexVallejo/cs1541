@@ -63,11 +63,11 @@ struct cache_t * cache_create(int size, int blocksize, int assoc, enum cache_pol
 }
 
 long calc_index(long address, int blocksize){
-  return address / blocksize;
+  return address / number_of_entries;
 }
 
 unsigned long calc_tag(unsigned long address, int blocksize){
-  return address % blocksize;
+  return (address / blocksize) % number_of_entries ;
 }
 
 int detect_hit(struct cache_t *cp, unsigned long req_tag, long req_index,
