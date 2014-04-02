@@ -44,8 +44,8 @@ struct cache_t * cache_create(int size, int blocksize, int assoc, enum cache_pol
   int nsets;   // number of sets (entries) in the cache
 
   //TODO verify that this is correct
-  nblocks = assoc;
-  nsets = size / (blocksize * assoc);
+  nblocks = (size*1024) / blocksize;
+  nsets = nblocks / assoc;
 
   struct cache_t *C = (struct cache_t *)calloc(1, sizeof(struct cache_t));
 
@@ -62,12 +62,12 @@ struct cache_t * cache_create(int size, int blocksize, int assoc, enum cache_pol
   return C;
 }
 
-long calc_index(long address, int blocksize){
-  return address / number_of_entries;
+long calc_index(long address, int nsets){
+  return (address / blocksize) % nsets;
 }
 
-unsigned long calc_tag(unsigned long address, int blocksize){
-  return (address / blocksize) % number_of_entries ;
+unsigned long calc_tag(unsigned long address, int nsets){
+  return (address / blocksize) / nsets;
 }
 
 int detect_hit(struct cache_t *cp, unsigned long req_tag, long req_index,
@@ -173,8 +173,8 @@ int cache_access(struct cache_t *cp, unsigned long address,
   unsigned long requested_tag;
   struct cache_blk_t temp;
 
-  requested_index = calc_index(address, cp->bsize);
-  requested_tag = calc_tag(address, cp->bsize);
+  requested_index = calc_index(address, cp->nsets);
+  requested_tag = calc_tag(address, cp->nsets);
   hit = 0;
 
   if(detect_hit(cp, requested_tag, requested_index, access_type, now) == 1){
