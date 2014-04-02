@@ -62,32 +62,46 @@ struct cache_t * cache_create(int size, int blocksize, int assoc, enum cache_pol
   return C;
 }
 
-long calc_index(long address){
-  //HOW DO WE CALCULATE THIS AND GET BLOCK SIZE FOR THE STRUCT
+//TODO fix these calculations to be correct
+long calc_index(long address, int blocksize){
   return address / blocksize;
 }
 
-long calc_tag(long address){
-  //HOW DO WE CALCULATE THIS AND GET BLOCK SIZE FOR THE STRUCT
+//TODO fix these calculations to be correct
+unsigned long calc_tag(unsigned long address, int blocksize){
   return address % blocksize;
+}
+
+int detect_hit(struct cache_t *cp, unsigned long req_tag, long req_index){
+  int i;
+  struct cache_blk_t temp;
+
+  for(i = 0; i < cp->assoc; i++){
+    if(cp->blocks[i][req_index]->tag == req_tag)
+      return 1;
+  }
+  return 0;
 }
 
 // return 0 if a hit, 1 if a miss or 2 if a miss_with_write_back
 int cache_access(struct cache_t *cp, unsigned long address,
              char access_type, unsigned long long now) {
+  int hit;
+  int i;
   long requested_index;
-  long requested_tag;
+  unsigned long requested_tag;
+  struct cache_blk_t temp;
 
-  requested_index = calc_index(address);
-  requested_tag = calc_tag(address);
+  requested_index = calc_index(address, cp->bsize);
+  requested_tag = calc_tag(address, cp->bsize);
+  hit = 0;
 
-  //Check index for tag
-  if(//Hit){
+  if(detect_hit(cp, requested_tag, requested_index) == 1){
     return 0;
   }
-  if(//Miss w/ writeback){
+  else if(){
   }
-  if(//miss){
+  if(){
   }
 }
 
