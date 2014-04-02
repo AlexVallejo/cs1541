@@ -125,36 +125,50 @@ int main(int argc, char **argv){
     else{
       if (tr_entry->type == ti_LOAD){
         if (trace_view_on)
-          printf("LOAD %x \n",tr_entry->Addr);
+          printf("LOAD %x Miss: %d Hit: %d\n",tr_entry->Addr, misses, hits);
         accesses++;
         read_accesses++;
         result = cache_access(cp, tr_entry->Addr, 0 , cycle_count);
+
+        switch (result){
+          case 0:
+            hits++;
+            break;
+          case 1:
+            misses++;
+            break;
+          case 2:
+            misses_with_writeback++;
+            break;
+          default:
+            fprintf(stdout, "\n%s%s\n" , "** Return of cache_access invalid. ",
+                            "Data integrity compromised. **\n");
+            exit(1);
+        }
       }
 
       if (tr_entry->type == ti_STORE){
         if (trace_view_on)
-          printf("STORE %x \n",tr_entry->Addr);
+          printf("STORE %x Miss: %d Hit: %d\n",tr_entry->Addr, misses, hits);
         accesses++;
         write_accesses++;
         result = cache_access(cp, tr_entry->Addr, 1, cycle_count);
-      }
-      // based on the value returned, update the statisctics for hits, misses
-      // and misses_with_writeback
 
-      switch (result){
-        case 0:
-          hits++;
-          break;
-        case 1:
-          misses++;
-          break;
-        case 2:
-          misses_with_writeback++;
-          break;
-        default:
-          fprintf(stdout, "\n%s%s\n" , "** Return of cache_access invalid. ",
-                          "Data integrity compromised. **\n");
-          exit(1);
+        switch (result){
+          case 0:
+            hits++;
+            break;
+          case 1:
+            misses++;
+            break;
+          case 2:
+            misses_with_writeback++;
+            break;
+          default:
+            fprintf(stdout, "\n%s%s\n" , "** Return of cache_access invalid. ",
+                            "Data integrity compromised. **\n");
+            exit(1);
+        }
       }
     }
     cycle_count++;
