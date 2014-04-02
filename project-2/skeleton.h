@@ -74,7 +74,7 @@ int detect_hit(struct cache_t *cp, unsigned long req_tag, long req_index,
                char access_type, unsigned long long now){
   int i;
   for(i = 0; i < cp->assoc; i++){
-    if(cp->blocks[i][req_index]->tag == req_tag){
+    if(cp->blocks[i][req_index]->tag == req_tag && cp->blocks[i][req_index]->valid == 1){
       cp->blocks[i][req_index]->time = now;
       if(access_type = 1){
         cp->blocks[i][req_index]->dirty = 1;
@@ -87,7 +87,7 @@ int detect_hit(struct cache_t *cp, unsigned long req_tag, long req_index,
 
 // return 0 if a hit, 1 if a miss or 2 if a miss_with_write_back
 int cache_access(struct cache_t *cp, unsigned long address,
-             char access_type, unsigned long long now) {
+                 char access_type, unsigned long long now){
   int hit;
   int i;
   long requested_index;
