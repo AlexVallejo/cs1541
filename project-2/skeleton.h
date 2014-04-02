@@ -16,7 +16,7 @@ struct cache_blk_t {
   unsigned long tag;
   char valid;
   char dirty;
-  int time;
+  unsigned long long time;
 };
 
 enum cache_policy {
@@ -72,13 +72,16 @@ unsigned long calc_tag(unsigned long address, int blocksize){
   return address % blocksize;
 }
 
-int detect_hit(struct cache_t *cp, unsigned long req_tag, long req_index){
+int detect_hit(struct cache_t *cp, unsigned long req_tag, long req_index,
+               char access, unsigned long long cycle){
   int i;
   struct cache_blk_t temp;
-
+  //TODO update access time of hits
   for(i = 0; i < cp->assoc; i++){
-    if(cp->blocks[i][req_index]->tag == req_tag)
+    if(cp->blocks[i][req_index]->tag == req_tag){
+      cp->blocks[i][req_index]->
       return 1;
+    }
   }
   return 0;
 }
@@ -96,7 +99,7 @@ int cache_access(struct cache_t *cp, unsigned long address,
   requested_tag = calc_tag(address, cp->bsize);
   hit = 0;
 
-  if(detect_hit(cp, requested_tag, requested_index) == 1){
+  if(detect_hit(cp, requested_tag, requested_index, access_type, now) == 1){
     return 0;
   }
   else if(){
