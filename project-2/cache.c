@@ -65,6 +65,7 @@ int main(int argc, char **argv){
   size_t size;
   char *trace_file_name;
   char trace_view_on, cache_size, block_size, cache_sets, replacement_policy;
+  unsigned long long int cycle_count = 0;
 
   if (argc != 7) {
     fprintf(stdout, "\nUSAGE: cache <trace_file> <trace_view_on> <cache size (power of 2)> <block size (power of 2)> <cache associtivity (power of 2)> <replacement policy 0 => LRU 1 => FIFO\n");
@@ -110,7 +111,6 @@ int main(int argc, char **argv){
   struct cache_t *cp = cache_create(cache_size, block_size, cache_sets, replacement_policy);
 
   while (1){
-    unsigned long long int cycle_count = 0;
     size = trace_get_item(&tr_entry);
     int result = -1;
 
