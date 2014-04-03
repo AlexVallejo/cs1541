@@ -64,7 +64,7 @@ int main(int argc, char **argv){
   struct trace_item *tr_entry;
   size_t size;
   char *trace_file_name;
-  char trace_view_on, cache_size, block_size, cache_sets, replacement_policy;
+  int trace_view_on, cache_size, block_size, cache_sets, replacement_policy;
   unsigned long long int cycle_count = 0;
 
   if (argc != 7) {
@@ -79,11 +79,19 @@ int main(int argc, char **argv){
   cache_sets         = atoi(argv[5]);
   replacement_policy = atoi(argv[6]);
 
-  if (   !is_power_of_two(cache_size)
-      || !is_power_of_two(block_size)
-      || !is_power_of_two(cache_sets)
-     ){
-    fprintf(stdout, "Cache size, block size and associativity must be powers of 2");
+  // Input validations
+  if (!is_power_of_two(cache_size)) {
+    fprintf(stdout, "Cache size must be a power of 2");
+    exit(1);
+  }
+
+  if (!is_power_of_two(block_size)){
+    fprintf(stdout, "Block size must be a power of 2");
+    exit(1);
+  }
+
+  if (!is_power_of_two(cache_sets)) {
+    fprintf(stdout, "Associtivity must be a power of 2");
     exit(1);
   }
 
@@ -97,7 +105,7 @@ int main(int argc, char **argv){
     exit(1);
   }
 
-  fprintf(stdout, "\n ** opening file %s **\n", trace_file_name);
+  fprintf(stdout, "\n ** opening file %s ** \n\n", trace_file_name);
 
   trace_fd = fopen(trace_file_name, "rb");
 
