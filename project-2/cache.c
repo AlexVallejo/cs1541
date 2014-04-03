@@ -117,6 +117,9 @@ int main(int argc, char **argv){
       printf("+ number of accesses : %d \n", accesses);
       printf("+ number of reads : %d \n", read_accesses);
       printf("+ number of writes : %d \n", write_accesses);
+      printf("+ number of hits : %d \n", hits);
+      printf("+ number of misses : %d \n", misses);
+      printf("+ number of misses with write back : %d \n", misses_with_writeback);
       break;
     }
 
