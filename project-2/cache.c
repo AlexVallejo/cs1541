@@ -92,7 +92,6 @@ int main(int argc, char **argv){
     exit(1);
   }
 
-  //TODO fix this. It's not wrong to pass the "LRU" or "FIFO" cause its an enum
   if (replacement_policy != 0 && replacement_policy != 1){
     fprintf(stdout, "Replacement policy must be LRU (0) or FIFO (1)");
     exit(1);
@@ -121,11 +120,10 @@ int main(int argc, char **argv){
       break;
     }
 
-    // process only loads and stores
     else{
       if (tr_entry->type == ti_LOAD){
         if (trace_view_on)
-          printf("LOAD %x Miss: %d Hit: %d\n",tr_entry->Addr, misses, hits);
+          printf("LOAD %x\n",tr_entry->Addr);
         accesses++;
         read_accesses++;
         result = cache_access(cp, tr_entry->Addr, 0 , cycle_count);
@@ -149,7 +147,7 @@ int main(int argc, char **argv){
 
       if (tr_entry->type == ti_STORE){
         if (trace_view_on)
-          printf("STORE %x Miss: %d Hit: %d\n",tr_entry->Addr, misses, hits);
+          printf("STORE %x\n",tr_entry->Addr);
         accesses++;
         write_accesses++;
         result = cache_access(cp, tr_entry->Addr, 1, cycle_count);
@@ -178,4 +176,3 @@ int main(int argc, char **argv){
 
   exit(0);
 }
-

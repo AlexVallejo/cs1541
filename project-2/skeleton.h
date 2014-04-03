@@ -35,15 +35,10 @@ struct cache_t {
 };
 
 struct cache_t * cache_create(int size, int blocksize, int assoc, enum cache_policy policy){
-  // The cache is represented by a 2-D array of blocks.
-  // The first dimension of the 2D array is "nsets" which is the number of sets (entries)
-  // The second dimension is "assoc", which is the number of blocks in each set.
-
   int i;
   int nblocks; // number of blocks in the cache
   int nsets;   // number of sets (entries) in the cache
 
-  //TODO verify that this is correct
   nblocks = (size*1024) / blocksize;
   nsets = nblocks / assoc;
 
@@ -90,17 +85,12 @@ int calc_LRU(struct cache_t *cp, long req_index){
   int LRU;
   unsigned long long temp_time;
   int i;
-  printf("\nSTART LRU\n");
 
-  //FAILS TO PRINT HERE
-  printf("\n last_time = %llu", cp->blocks[req_index][i].last_time);
-
-  temp_time = cp->blocks[req_index][i].last_time;
+  temp_time = cp->blocks[req_index][0].last_time;
   LRU = 0;
 
   for(i = 0; i < cp->assoc; i++){
     if(cp->blocks[req_index][i].last_time < temp_time){
-      //printf("\n i = %d last_time = %llu temp_time = %llu\n", i, cp->blocks[req_index][i].last_time, temp_time);
       temp_time = cp->blocks[req_index][i].last_time;
       LRU = i;
     }
@@ -113,7 +103,7 @@ int calc_FIFO(struct cache_t *cp, long req_index){
   unsigned long long temp_time;
   int i;
 
-  temp_time = cp->blocks[req_index][i].first_time;
+  temp_time = cp->blocks[req_index][0].first_time;
   FIFO = 0;
 
   for(i = 0; i < cp->assoc; i++){
@@ -141,7 +131,6 @@ int detect_miss(struct cache_t *cp, unsigned long req_tag, long req_index,
     }
   }
 
-  printf("\nCALL LRU or FIFO\n");
   if(cp->policy == 0)
     replacement_index = calc_LRU(cp, req_index);
   else
@@ -184,7 +173,6 @@ int cache_access(struct cache_t *cp, unsigned long address,
   if(detect_hit(cp, requested_tag, requested_index, access_type, now) == 1){
     return 0;
   }
-  printf("\nCALL Detect Miss\n");
 
   detected_miss = detect_miss(cp, requested_tag, requested_index, access_type, now);
 
