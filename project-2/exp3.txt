@@ -1,0 +1,117 @@
+
+ ** opening file /afs/cs.pitt.edu/courses/1541/long_traces/sample_large1.tr
+This is for trace file: /afs/cs.pitt.edu/courses/1541/long_traces/sample_large1.tr 
+Cache size of: 4 KB
+Block size of: 32 bytes
+Associativity of: 1 
+Replacement policy: 0 
++ number of accesses : 30438865 
++ number of reads : 20813032 
++ number of writes : 9625833 
++ number of hits : 20771557 
++ number of misses : 7697929 
++ number of misses_with_writeback : 1969379 
+
+ ** opening file /afs/cs.pitt.edu/courses/1541/long_traces/sample_large2.tr
+This is for trace file: /afs/cs.pitt.edu/courses/1541/long_traces/sample_large2.tr 
+Cache size of: 4 KB
+Block size of: 32 bytes
+Associativity of: 1 
+Replacement policy: 0 
++ number of accesses : 35769546 
++ number of reads : 23718431 
++ number of writes : 12051115 
++ number of hits : 24879188 
++ number of misses : 9276817 
++ number of misses_with_writeback : 1613541 
+
+ ** opening file /afs/cs.pitt.edu/courses/1541/long_traces/sample_large3.tr
+This is for trace file: /afs/cs.pitt.edu/courses/1541/long_traces/sample_large3.tr 
+Cache size of: 4 KB
+Block size of: 32 bytes
+Associativity of: 1 
+Replacement policy: 0 
++ number of accesses : 36084985 
++ number of reads : 29411338 
++ number of writes : 6673647 
++ number of hits : 15952062 
++ number of misses : 14919161 
++ number of misses_with_writeback : 5213762 
+
+ ** opening file /afs/cs.pitt.edu/courses/1541/long_traces/sample_large1.tr
+This is for trace file: /afs/cs.pitt.edu/courses/1541/long_traces/sample_large1.tr 
+Cache size of: 4 KB
+Block size of: 32 bytes
+Associativity of: 4 
+Replacement policy: 0 
++ number of accesses : 30438865 
++ number of reads : 20813032 
++ number of writes : 9625833 
++ number of hits : 23924859 
++ number of misses : 5546243 
++ number of misses_with_writeback : 967763 
+
+ ** opening file /afs/cs.pitt.edu/courses/1541/long_traces/sample_large2.tr
+This is for trace file: /afs/cs.pitt.edu/courses/1541/long_traces/sample_large2.tr 
+Cache size of: 4 KB
+Block size of: 32 bytes
+Associativity of: 4 
+Replacement policy: 0 
++ number of accesses : 35769546 
++ number of reads : 23718431 
++ number of writes : 12051115 
++ number of hits : 26985887 
++ number of misses : 7714154 
++ number of misses_with_writeback : 1069505 
+
+ ** opening file /afs/cs.pitt.edu/courses/1541/long_traces/sample_large3.tr
+This is for trace file: /afs/cs.pitt.edu/courses/1541/long_traces/sample_large3.tr 
+Cache size of: 4 KB
+Block size of: 32 bytes
+Associativity of: 4 
+Replacement policy: 0 
++ number of accesses : 36084985 
++ number of reads : 29411338 
++ number of writes : 6673647 
++ number of hits : 17219663 
++ number of misses : 13706501 
++ number of misses_with_writeback : 5158821 
+
+ ** opening file /afs/cs.pitt.edu/courses/1541/long_traces/sample_large1.tr
+This is for trace file: /afs/cs.pitt.edu/courses/1541/long_traces/sample_large1.tr 
+Cache size of: 4 KB
+Block size of: 32 bytes
+Associativity of: 16 
+Replacement policy: 0 
++ number of accesses : 30438865 
++ number of reads : 20813032 
++ number of writes : 9625833 
++ number of hits : 24143539 
++ number of misses : 5369651 
++ number of misses_with_writeback : 925675 
+
+ ** opening file /afs/cs.pitt.edu/courses/1541/long_traces/sample_large2.tr
+This is for trace file: /afs/cs.pitt.edu/courses/1541/long_traces/sample_large2.tr 
+Cache size of: 4 KB
+Block size of: 32 bytes
+Associativity of: 16 
+Replacement policy: 0 
++ number of accesses : 35769546 
++ number of reads : 23718431 
++ number of writes : 12051115 
++ number of hits : 27545501 
++ number of misses : 7270356 
++ number of misses_with_writeback : 953689 
+
+ ** opening file /afs/cs.pitt.edu/courses/1541/long_traces/sample_large3.tr
+This is for trace file: /afs/cs.pitt.edu/courses/1541/long_traces/sample_large3.tr 
+Cache size of: 4 KB
+Block size of: 32 bytes
+Associativity of: 16 
+Replacement policy: 0 
++ number of accesses : 36084985 
++ number of reads : 29411338 
++ number of writes : 6673647 
++ number of hits : 17277502 
++ number of misses : 13652612 
++ number of misses_with_writeback : 5154871 
