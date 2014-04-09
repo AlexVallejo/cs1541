@@ -1,0 +1,55 @@
+Data collected on April 9th 2014 @ 10:30 am on thot.cs.pitt.edu
+
+-----------------------------
+
+points => 5000 threads => 1
+ Computed PI = 3.163200
+0.000586
+
+points => 5000 threads => 2
+ Computed PI = 3.149600
+0.000488
+
+points => 5000 threads => 4
+ Computed PI = 3.144800
+0.000527
+
+points => 5000 threads => 8
+ Computed PI = 3.045600
+0.001409
+
+-----------------------------
+
+points => 50000 threads => 1
+ Computed PI = 3.146160
+0.003003
+
+points => 50000 threads => 2
+ Computed PI = 3.148560
+0.001690
+
+points => 50000 threads => 4
+ Computed PI = 3.134640
+0.001719
+
+points => 50000 threads => 8
+ Computed PI = 3.164080
+0.001804
+
+-----------------------------
+
+points => 500000 threads => 1
+ Computed PI = 3.143224
+0.026796
+
+points => 500000 threads => 2
+ Computed PI = 3.143272
+0.013607
+
+points => 500000 threads => 4
+ Computed PI = 3.149784
+0.013671
+
+points => 500000 threads => 8
+ Computed PI = 3.147832
+0.010356
