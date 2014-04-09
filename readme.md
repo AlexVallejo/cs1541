@@ -7,4 +7,4 @@ Instructor: [Prof. Rami Melhem](http://people.cs.pitt.edu/~melhem/)
 
 [Project 2](project-2/description.pdf) — simulation of different cache implementations
 
-[Homework 6](homework-6/description.pdf) - parallel processing
+[Homework 6](homework-6/description.pdf) — parallel processing
